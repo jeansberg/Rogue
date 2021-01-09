@@ -44,9 +44,13 @@ namespace Rogue {
             ConsoleHelpers.DrawMap(map);
 
             PlaceRooms(map);
+            //System.Console.ReadKey();
+
             var maze = new Maze(map);
 
             maze.CarveMaze(Point.Zero);
+            //System.Console.ReadKey();
+
             ConnectRooms(map);
  
             return map;
@@ -60,7 +64,9 @@ namespace Rogue {
                 }
             }
 
-            foreach(var room in Rooms)
+            //System.Console.ReadKey();
+
+            foreach (var room in Rooms)
             {
                 var connectors = room.Points()
                     .SelectMany(p => map.GetAdjacentCells(p.X, p.Y)
@@ -69,12 +75,13 @@ namespace Rogue {
 
                 connectors.ForEach(c => {
                     c.Type = CellType.Wall;
-                    ConsoleHelpers.DrawCell(c);
+                    ConsoleHelpers.DrawCell(c, ConsoleColor.DarkGray);
                 });
                 if (connectors.Any()) {
                     var connector = connectors[Rnd.Next(0, connectors.Count)];
                     connector.Type = (connector.X == room.Left - 1 || connector.X == room.Right) ? CellType.DoorVertical : CellType.DoorHorizontal;
                     ConsoleHelpers.DrawCell(connector, ConsoleColor.Red);
+                    map.SetCellProperties(connector.X, connector.Y, false, true);
                 }
                 else {
                     // Remove non-connected room
@@ -87,6 +94,7 @@ namespace Rogue {
                     });
                 }
             }
+
         }
 
         private bool BetweenMazeAndRoom(MapCell cell, Map<MapCell> map) {

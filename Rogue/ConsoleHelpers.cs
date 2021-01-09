@@ -1,4 +1,5 @@
-﻿using Rogue.MazeGenerator;
+﻿using Rogue.Actors;
+using Rogue.MazeGenerator;
 using RogueSharp;
 using System;
 using System.Threading;
@@ -15,7 +16,12 @@ namespace Rogue {
             Console.ForegroundColor = color;
             Console.Write(cell);
             Console.ForegroundColor = ConsoleColor.Gray;
-            Thread.Sleep(20);
+            //Thread.Sleep(50);
+        }
+
+        public static void DrawActor(Actor actor) {
+            Console.SetCursorPosition(actor.Location.X, actor.Location.Y);
+            Console.Write(actor);
         }
     }
 }
