@@ -1,23 +1,21 @@
 ﻿using Rogue.Actors;
+using Rogue.Graphics;
 using Rogue.MazeGenerator;
 using RogueSharp;
-using System;
 using System.Collections.Generic;
 
-namespace Rogue
-{
+namespace Rogue {
     class Program
     {
+        private const int Width = 60;
+        private const int Height = 40;
         private static Map<MapCell> map;
         private static Player player;
 
         static void Main(string[] args)
         {
-            var generator = new MapGenerator(30, 20, 30, 3, 6, 3, 6);
+            var generator = new MapGenerator(Width, Height, 30, 3, 9, 3, 9);
 
-            System.Console.ForegroundColor = System.ConsoleColor.DarkGray;
-            System.Console.SetWindowSize(100, 50);
-            System.Console.CursorVisible = false;
             map = generator.GenerateMap();
 
             player = new Player {
@@ -28,37 +26,29 @@ namespace Rogue
                 player
             };
 
-            while (true) {
-                ConsoleHelpers.DrawMap(map);
-                ConsoleHelpers.DrawActor(player);
+            // Setup the engine and create the main window.
+            SadConsole.Game.Create(Width + 20 + 2, Height + 2);
 
-                Update();
-            }
+            // Hook the start event so we can add consoles to the system.
+            SadConsole.Game.Instance.OnStart = Init;
 
-            System.Console.ReadKey();
+            // Start the game.
+            SadConsole.Game.Instance.Run();
+            SadConsole.Game.Instance.Dispose();
         }
 
-        private static void Update() {
-            var input = System.Console.ReadKey();
-            if (input.Key == ConsoleKey.UpArrow) {
-                MoveActor(Direction.North);
-            } else if (input.Key == ConsoleKey.DownArrow) {
-                MoveActor(Direction.South);
-            }
-            else if (input.Key == ConsoleKey.LeftArrow) {
-                MoveActor(Direction.West);
-            }
-            else if (input.Key == ConsoleKey.RightArrow) {
-                MoveActor(Direction.East);
-            }
+        private static void Init() {
+            // Any startup code for your game. We will use an example console for now
+            var mapConsole = new MapConsole(map, player);
+            var logConsole = new LogConsole();
+            var mainConsole = new MainConsole();
+            mainConsole.Children.Add(mapConsole);
+            mainConsole.Children.Add(logConsole);
 
-        }
 
-        private static void MoveActor(Direction dir) {
-            var newPoint = player.Location.Increment(dir);
-            if (map.InBounds(newPoint) && map[newPoint.X, newPoint.Y].IsWalkable) {
-                player.Location = newPoint;
-            }
+            mapConsole.SadComponents.Add(new KeyboardChangeBoard(map, player));
+
+            SadConsole.Game.Instance.Screen = mainConsole;
         }
     }
 }

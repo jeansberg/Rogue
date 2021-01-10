@@ -41,15 +41,12 @@ namespace Rogue {
             foreach(var cell in map.GetAllCells()) {
                 cell.Type = CellType.Wall;
             }
-            ConsoleHelpers.DrawMap(map);
 
             PlaceRooms(map);
-            //System.Console.ReadKey();
 
             var maze = new Maze(map);
 
             maze.CarveMaze(Point.Zero);
-            //System.Console.ReadKey();
 
             ConnectRooms(map);
  
@@ -60,11 +57,8 @@ namespace Rogue {
             foreach(var cell in map.GetAllCells().Where(c => c.Type == CellType.Wall)) {
                 if (BetweenMazeAndRoom(cell, map)) {
                     cell.Type = CellType.Connector;
-                    ConsoleHelpers.DrawCell(cell);
                 }
             }
-
-            //System.Console.ReadKey();
 
             foreach (var room in Rooms)
             {
@@ -75,13 +69,13 @@ namespace Rogue {
 
                 connectors.ForEach(c => {
                     c.Type = CellType.Wall;
-                    ConsoleHelpers.DrawCell(c, ConsoleColor.DarkGray);
                 });
                 if (connectors.Any()) {
-                    var connector = connectors[Rnd.Next(0, connectors.Count)];
-                    connector.Type = (connector.X == room.Left - 1 || connector.X == room.Right) ? CellType.DoorVertical : CellType.DoorHorizontal;
-                    ConsoleHelpers.DrawCell(connector, ConsoleColor.Red);
-                    map.SetCellProperties(connector.X, connector.Y, false, true);
+                    var connector = CreateDoor(map, room, connectors);
+                    if (connectors.Count > 1 && Rnd.Next(0, 2) == 1) {
+                        connectors.Remove(connector);
+                        CreateDoor(map, room, connectors);
+                    }
                 }
                 else {
                     // Remove non-connected room
@@ -90,11 +84,18 @@ namespace Rogue {
                     {
                         var mapCell = map[p.X, p.Y];
                         mapCell.Type = CellType.Wall;
-                        ConsoleHelpers.DrawCell(mapCell, ConsoleColor.DarkGray);
                     });
                 }
             }
 
+        }
+
+        private MapCell CreateDoor(Map<MapCell> map, Rectangle room, List<MapCell> connectors) {
+            var connector = connectors[Rnd.Next(0, connectors.Count)];
+            connector.Type = (connector.X == room.Left - 1 || connector.X == room.Right) ? CellType.DoorVertical : CellType.DoorHorizontal;
+            map.SetCellProperties(connector.X, connector.Y, false, true);
+
+            return connector;
         }
 
         private bool BetweenMazeAndRoom(MapCell cell, Map<MapCell> map) {
@@ -156,7 +157,6 @@ namespace Rogue {
                 {
                     map.SetCellProperties(x, y, true, true);
                     map[x, y].Type = CellType.Room;
-                    ConsoleHelpers.DrawCell(map[x, y]);
                 }
             }
         }

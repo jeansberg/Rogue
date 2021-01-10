@@ -23,7 +23,6 @@ namespace Rogue.MazeGenerator {
             map.SetCellProperties(point.X, point.Y, true, true);
 
             map[point.X, point.Y].Type = CellType.Maze;
-            ConsoleHelpers.DrawCell(map[point.X, point.Y]);
 
             var directions = new List<Direction> { East, West, North, South }
                 .OrderBy(x => Guid.NewGuid());
