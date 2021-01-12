@@ -1,7 +1,8 @@
-﻿using Rogue.Actors;
+﻿using Rogue.GameObjects;
 using Rogue.Graphics;
 using Rogue.MazeGenerator;
 using RogueSharp;
+using SadRogue.Primitives;
 using System.Collections.Generic;
 
 namespace Rogue {
@@ -9,7 +10,7 @@ namespace Rogue {
     {
         private const int Width = 60;
         private const int Height = 40;
-        private static Map<MapCell> map;
+        private static RogueMap<MapCell> map;
         private static Player player;
 
         static void Main(string[] args)
@@ -18,9 +19,7 @@ namespace Rogue {
 
             map = generator.GenerateMap();
 
-            player = new Player {
-                Location = Point.Zero
-            };
+            player = new Player(new SadRogue.Primitives.Point(0, 0), Color.Yellow);
 
             var actors = new List<Actor> {
                 player

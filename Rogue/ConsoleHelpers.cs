@@ -1,4 +1,4 @@
-﻿using Rogue.Actors;
+﻿using Rogue.GameObjects;
 using Rogue.MazeGenerator;
 using RogueSharp;
 using System;

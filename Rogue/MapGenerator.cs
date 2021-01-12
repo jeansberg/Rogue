@@ -1,9 +1,10 @@
-﻿using Rogue.MazeGenerator;
+﻿using Rogue.GameObjects;
+using Rogue.MazeGenerator;
 using RogueSharp;
+using SadConsole;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace Rogue {
     public class MapGenerator
@@ -35,9 +36,9 @@ namespace Rogue {
             Rnd = new Random();
         }
 
-        public Map<MapCell> GenerateMap()
+        public RogueMap<MapCell> GenerateMap()
         {
-            var map = new Map<MapCell>(Width, Height);
+            var map = new RogueMap<MapCell>(Width, Height);
             foreach(var cell in map.GetAllCells()) {
                 cell.Type = CellType.Wall;
             }
@@ -46,14 +47,14 @@ namespace Rogue {
 
             var maze = new Maze(map);
 
-            maze.CarveMaze(Point.Zero);
+            maze.CarveMaze(new SadRogue.Primitives.Point(0, 0));
 
             ConnectRooms(map);
  
             return map;
         }
 
-        private void ConnectRooms(Map<MapCell> map) {
+        private void ConnectRooms(RogueMap<MapCell> map) {
             foreach(var cell in map.GetAllCells().Where(c => c.Type == CellType.Wall)) {
                 if (BetweenMazeAndRoom(cell, map)) {
                     cell.Type = CellType.Connector;
@@ -90,11 +91,17 @@ namespace Rogue {
 
         }
 
-        private MapCell CreateDoor(Map<MapCell> map, Rectangle room, List<MapCell> connectors) {
+        private MapCell CreateDoor(RogueMap<MapCell> map, Rectangle room, List<MapCell> connectors) {
             var connector = connectors[Rnd.Next(0, connectors.Count)];
-            connector.Type = (connector.X == room.Left - 1 || connector.X == room.Right) ? CellType.DoorVertical : CellType.DoorHorizontal;
-            map.SetCellProperties(connector.X, connector.Y, false, true);
+            connector.Type = CellType.Maze;
+            var door = new Door(
+                new SadRogue.Primitives.Point(connector.X, connector.Y), 
+                (connector.X == room.Left - 1 || connector.X == room.Right) ? Orientation.Vertical : Orientation.Horizontal);
 
+            map.GameObjects.Add(door);
+
+            map.SetCellProperties(connector.X, connector.Y, true, true);
+            
             return connector;
         }
 

@@ -1,7 +1,5 @@
-﻿using Rogue.MazeGenerator;
-using RogueSharp;
+﻿using SadRogue.Primitives;
 using System;
-using static Rogue.MazeGenerator.Direction;
 
 namespace Rogue {
     public static class PointExtensions {
@@ -10,11 +8,11 @@ namespace Rogue {
         public static Point West(this Point point) => new Point(point.X - 1, point.Y);
         public static Point South(this Point point) => new Point(point.X, point.Y + 1);
 
-        public static Point Increment(this Point point, Direction dir) => dir switch {
-            Direction.North => new Point(point.X, point.Y - 1),
-            Direction.East => new Point(point.X + 1, point.Y),
-            Direction.South => new Point(point.X, point.Y + 1),
-            Direction.West => new Point(point.X - 1, point.Y),
+        public static Point Increment(this Point point, Direction.Types dir) => dir switch {
+            Direction.Types.Up => new Point(point.X, point.Y - 1),
+            Direction.Types.Right => new Point(point.X + 1, point.Y),
+            Direction.Types.Down => new Point(point.X, point.Y + 1),
+            Direction.Types.Left => new Point(point.X - 1, point.Y),
             _ => throw new NotImplementedException(),
         };
     }

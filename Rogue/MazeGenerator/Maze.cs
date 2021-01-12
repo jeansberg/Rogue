@@ -1,20 +1,18 @@
-﻿using RogueSharp;
+﻿using SadRogue.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using static Rogue.MazeGenerator.Direction;
-using Point = RogueSharp.Point;
+using static SadRogue.Primitives.Direction;
 
 
 namespace Rogue.MazeGenerator {
 
     public class Maze {
-        private readonly Map<MapCell> map;
+        private readonly RogueMap<MapCell> map;
         private List<Point> visitedPoints;
 
-        public Maze(Map<MapCell> map) {
-            visitedPoints = new List<Point>();
+        public Maze(RogueMap<MapCell> map) {
+            visitedPoints = new List<SadRogue.Primitives.Point>();
             this.map = map;
         }
 
@@ -24,7 +22,7 @@ namespace Rogue.MazeGenerator {
 
             map[point.X, point.Y].Type = CellType.Maze;
 
-            var directions = new List<Direction> { East, West, North, South }
+            var directions = new List<Direction> { Right, Left, Up, Down }
                 .OrderBy(x => Guid.NewGuid());
 
             foreach (var dir in directions) {
@@ -35,7 +33,7 @@ namespace Rogue.MazeGenerator {
             }
         }
 
-        private bool IsValid(Point nextPoint, Direction dir) {
+        private bool IsValid(Point nextPoint, Types dir) {
             if (visitedPoints.Contains(nextPoint)) {
                 return false;
             }
@@ -48,28 +46,28 @@ namespace Rogue.MazeGenerator {
 
             // Don't break walls between corridors
             var adjacent = (dir switch {
-                North =>
+                Types.Up =>
                         // Check E, W, N
                         new List<Point> {
                             nextNext.East(),
                             nextNext.West(),
                             nextNext.North()
                         },
-                South =>
+                Types.Down =>
                         // Check E, W, S
                         new List<Point> {
                             nextNext.East(),
                             nextNext.West(),
                             nextNext.South()
                         },
-                East =>
+                Types.Right=>
                         // Check N, E, S
                         new List<Point> {
                             nextNext.North(),
                             nextNext.East(),
                             nextNext.South()
                         },
-                West =>
+                Types.Left=>
                         // Check W, N, S
                         new List<Point> {
                             nextNext.West(),

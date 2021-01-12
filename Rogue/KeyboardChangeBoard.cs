@@ -1,4 +1,4 @@
-﻿using Rogue.Actors;
+﻿using Rogue.GameObjects;
 using Rogue.MazeGenerator;
 using RogueSharp;
 using SadConsole;
@@ -16,7 +16,7 @@ namespace Rogue {
 
         public override void ProcessKeyboard(IScreenObject host, SadConsole.Input.Keyboard keyboard, out bool handled) {
             if (keyboard.IsKeyPressed(Keys.Down)) {
-                player.Location = new Point(0, 1);
+                player.Location = new SadRogue.Primitives.Point(0, 1);
             }
             handled = true;
         }

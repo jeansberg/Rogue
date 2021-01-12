@@ -1,16 +1,17 @@
-﻿using Rogue.Actors;
+﻿using Rogue.GameObjects;
 using Rogue.MazeGenerator;
 using RogueSharp;
 using SadConsole;
 using SadConsole.Input;
+using SadRogue.Primitives;
 using System;
 
 namespace Rogue.Graphics {
     public class MapConsole : SadConsole.Console {
-        private readonly Map<MapCell> map;
+        private readonly RogueMap<MapCell> map;
         private readonly Player player;
 
-        public MapConsole(Map<MapCell> map, Player player) : base(map.Width, map.Height + 1) {
+        public MapConsole(RogueMap<MapCell> map, Player player) : base(map.Width, map.Height + 1) {
             this.map = map;
             this.player = player;
 
@@ -19,29 +20,41 @@ namespace Rogue.Graphics {
 
         public override void Update(TimeSpan delta) {
             if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Down)) {
-                MoveActor(Direction.South);
+                MoveActor(Direction.Down);
             }
             else
             if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Up)) {
-                MoveActor(Direction.North);
+                MoveActor(Direction.Up);
             }
             else if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Left)) {
-                MoveActor(Direction.West);
+                MoveActor(Direction.Left);
             }
             else if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Right)) {
-                MoveActor(Direction.East);
+                MoveActor(Direction.Right);
             }
 
             this.Clear();
             DrawMap();
+            DrawObjects();
             DrawPlayer();
 
             base.Update(delta);
         }
 
+        private void DrawObjects() {
+            foreach(var gameObject in map.GameObjects) {
+                var coloredString = new ColoredString(gameObject.ToString(), gameObject.Color, Color.Black);
+
+                Cursor.Position = new SadRogue.Primitives.Point(gameObject.Location.X, gameObject.Location.Y);
+                Cursor.Print(coloredString);
+            }
+        }
+
         private void DrawPlayer() {
+            var coloredString = new ColoredString(player.ToString(), player.Color, Color.Black);
+
             Cursor.Position = new SadRogue.Primitives.Point(player.Location.X, player.Location.Y);
-            Cursor.Print(player.ToString());
+            Cursor.Print(coloredString);
         }
 
         private void DrawMap() {
