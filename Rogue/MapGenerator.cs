@@ -40,7 +40,7 @@ namespace Rogue {
         {
             var map = new RogueMap<MapCell>(Width, Height);
             foreach(var cell in map.GetAllCells()) {
-                cell.Type = CellType.Wall;
+                //cell.Type = CellType.Wall;
             }
 
             PlaceRooms(map);
@@ -55,22 +55,19 @@ namespace Rogue {
         }
 
         private void ConnectRooms(RogueMap<MapCell> map) {
-            foreach(var cell in map.GetAllCells().Where(c => c.Type == CellType.Wall)) {
+            var potentialConnectorCells = new List<MapCell>();
+            foreach (var cell in map.GetAllCells().Where(IsWall())) {
                 if (BetweenMazeAndRoom(cell, map)) {
-                    cell.Type = CellType.Connector;
+                    potentialConnectorCells.Add(cell);
                 }
             }
 
-            foreach (var room in Rooms)
-            {
+            foreach (var room in Rooms) {
                 var connectors = room.Points()
-                    .SelectMany(p => map.GetAdjacentCells(p.X, p.Y)
-                    .Where(c => c.Type == CellType.Connector))
+                    .SelectMany(p => map.GetAdjacentCells(p.X, p.Y))
+                    .Where(c => potentialConnectorCells.Contains(c))
                     .ToList();
 
-                connectors.ForEach(c => {
-                    c.Type = CellType.Wall;
-                });
                 if (connectors.Any()) {
                     var connector = CreateDoor(map, room, connectors);
                     if (connectors.Count > 1 && Rnd.Next(0, 2) == 1) {
@@ -81,7 +78,13 @@ namespace Rogue {
                 else {
                     // Remove non-connected room
                     // Todo: Fix this
-                    room.Points().ForEach(p =>
+                    var walls = room.Points().SelectMany(r => map.GetAdjacentCells(r.X, r.Y, true))
+                        .Select(c => new Point(c.X, c.Y));
+
+                    room.Points()
+                        .Concat(walls)
+                        .ToList()
+                        .ForEach(p =>
                     {
                         var mapCell = map[p.X, p.Y];
                         mapCell.Type = CellType.Wall;
@@ -89,6 +92,10 @@ namespace Rogue {
                 }
             }
 
+        }
+
+        private static Func<MapCell, bool> IsWall() {
+            return c => c.Type == CellType.Wall || c.Type == CellType.RoomWallHorizontal || c.Type == CellType.RoomWallVertical;
         }
 
         private MapCell CreateDoor(RogueMap<MapCell> map, Rectangle room, List<MapCell> connectors) {
@@ -107,7 +114,7 @@ namespace Rogue {
 
         private bool BetweenMazeAndRoom(MapCell cell, Map<MapCell> map) {
             var adjacent = map.GetAdjacentCells(cell.X, cell.Y);
-            if (adjacent.Any(adjacent => adjacent.Type == CellType.Room) 
+            if (adjacent.Any(adjacent => adjacent.Type == CellType.RoomFloor) 
                 && adjacent.Any(a => a.Type == CellType.Maze)) {
                 return true;
             }
@@ -115,15 +122,15 @@ namespace Rogue {
             return false;
         }
 
-        private void PlaceRooms(Map<MapCell> map)
+        private void PlaceRooms(RogueMap<MapCell> map)
         {
             Rooms = new List<Rectangle>();
 
             for (int i = 0; i < RoomAttempts; i++) {
                 var width = GetOddNumber(RoomMinWidth, RoomMaxWidth);
                 var height = GetOddNumber(RoomMinHeight, RoomMaxHeight);
-                int xPos = GetOddNumber(1, Width - width);
-                var yPos = GetOddNumber(1, Height - height);
+                int xPos = GetOddNumber(2, Width - width);
+                var yPos = GetOddNumber(2, Height - height);
 
                 Rectangle newRoom = new Rectangle(xPos, yPos, width, height);
                 if (!OverLapsRoom(newRoom)) {
@@ -156,14 +163,29 @@ namespace Rogue {
             return false;
         }
 
-        private void PlaceRoom(Map<MapCell> map, Rectangle room)
+        private void PlaceRoom(RogueMap<MapCell> map, Rectangle room)
         {
-            for(int x = room.X; x < room.X + room.Width; x++)
+            for (int x = room.X - 1; x < room.X + room.Width + 1; x++)
             {
-                for (int y = room.Y; y < room.Y + room.Height; y++)
+                for (int y = room.Y - 1; y < room.Y + room.Height + 1; y++)
                 {
-                    map.SetCellProperties(x, y, true, true);
-                    map[x, y].Type = CellType.Room;
+                    if (!map.InBounds(new SadRogue.Primitives.Point(x, y))) {
+                        continue;
+                    }
+
+                    if (y == room.Y - 1) {
+                        map[x, y].Type = CellType.RoomWallHorizontal;
+                    }
+                    else if (y == room.Y + room.Height) {
+                        map[x, y].Type = CellType.RoomWallHorizontal;
+                    }
+                    else if (x == room.X - 1 || x == room.X + room.Width) {
+                        map[x, y].Type = CellType.RoomWallVertical;
+                    }
+                    else {
+                        map.SetCellProperties(x, y, true, true);
+                        map[x, y].Type = CellType.RoomFloor;
+                    }
                 }
             }
         }

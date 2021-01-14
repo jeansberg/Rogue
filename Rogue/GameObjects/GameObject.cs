@@ -1,7 +1,7 @@
 ﻿using SadRogue.Primitives;
 
 namespace Rogue.GameObjects {
-    public class GameObject {
+    public abstract class GameObject : IHasAction {
         public GameObject(Point location, Color color) {
             Location = location;
             Color = color;
@@ -9,5 +9,7 @@ namespace Rogue.GameObjects {
 
         public Color Color { get; set; }
         public Point Location { get; set; }
+
+        public abstract IAction GetAction(Direction.Types from);
     }
 }

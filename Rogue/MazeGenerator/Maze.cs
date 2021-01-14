@@ -49,30 +49,30 @@ namespace Rogue.MazeGenerator {
                 Types.Up =>
                         // Check E, W, N
                         new List<Point> {
-                            nextNext.East(),
-                            nextNext.West(),
-                            nextNext.North()
+                            nextNext.Right(),
+                            nextNext.Left(),
+                            nextNext.Up()
                         },
                 Types.Down =>
                         // Check E, W, S
                         new List<Point> {
-                            nextNext.East(),
-                            nextNext.West(),
-                            nextNext.South()
+                            nextNext.Right(),
+                            nextNext.Left(),
+                            nextNext.Down()
                         },
                 Types.Right=>
                         // Check N, E, S
                         new List<Point> {
-                            nextNext.North(),
-                            nextNext.East(),
-                            nextNext.South()
+                            nextNext.Up(),
+                            nextNext.Right(),
+                            nextNext.Down()
                         },
                 Types.Left=>
                         // Check W, N, S
                         new List<Point> {
-                            nextNext.West(),
-                            nextNext.North(),
-                            nextNext.South(),
+                            nextNext.Left(),
+                            nextNext.Up(),
+                            nextNext.Down(),
                         },
                 _ => throw new NotImplementedException()
             }).Where(a => map.InBounds(a));

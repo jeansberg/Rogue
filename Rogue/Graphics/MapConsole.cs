@@ -5,33 +5,74 @@ using SadConsole;
 using SadConsole.Input;
 using SadRogue.Primitives;
 using System;
+using System.Linq;
 
 namespace Rogue.Graphics {
     public class MapConsole : SadConsole.Console {
         private readonly RogueMap<MapCell> map;
         private readonly Player player;
+        private InputState state;
 
         public MapConsole(RogueMap<MapCell> map, Player player) : base(map.Width, map.Height + 1) {
             this.map = map;
             this.player = player;
+            state = InputState.Idle;
 
             this.Position = new SadRogue.Primitives.Point(1, 1);
         }
 
         public override void Update(TimeSpan delta) {
-            if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Down)) {
-                MoveActor(Direction.Down);
+            if (state == InputState.Idle) {
+                if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Down)) {
+                    MoveActor(Direction.Down);
+                }
+                else
+                if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Up)) {
+                    MoveActor(Direction.Up);
+                }
+                else if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Left)) {
+                    MoveActor(Direction.Left);
+                }
+                else if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Right)) {
+                    MoveActor(Direction.Right);
+                }
+                else if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Space)) {
+                    this.state = InputState.Targeting;
+                }
+            } else if (state == InputState.Targeting) {
+                GameObject gameObject = null;
+                bool handled = false;
+                Direction.Types direction = Direction.None;
+                if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Down)) {
+                    gameObject = map.GameObjects.FirstOrDefault(g => g.Location == player.Location.Increment(Direction.Types.Down));
+                    direction = Direction.Types.Down;
+                    handled = true;
+                }
+                else if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Up)) {
+                    gameObject = map.GameObjects.FirstOrDefault(g => g.Location == player.Location.Increment(Direction.Types.Up));
+                    direction = Direction.Types.Up;
+                    handled = true;
+                }
+                else if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Left)) {
+                    gameObject = map.GameObjects.FirstOrDefault(g => g.Location == player.Location.Increment(Direction.Types.Left));
+                    direction = Direction.Types.Left;
+                    handled = true;
+                }
+                else if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Right)) {
+                    gameObject = map.GameObjects.FirstOrDefault(g => g.Location == player.Location.Increment(Direction.Types.Right));
+                    direction = Direction.Types.Right;
+                    handled = true;
+                }
+
+                if (handled) {
+                    state = InputState.Idle;
+                    if (gameObject != null) {
+                        var action = gameObject.GetAction(direction.Opposite());
+                        action.Perform(map);
+                    };
+                }
             }
-            else
-            if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Up)) {
-                MoveActor(Direction.Up);
-            }
-            else if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Left)) {
-                MoveActor(Direction.Left);
-            }
-            else if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Right)) {
-                MoveActor(Direction.Right);
-            }
+
 
             this.Clear();
             DrawMap();
@@ -76,6 +117,11 @@ namespace Rogue.Graphics {
             var newPoint = player.Location.Increment(dir);
             if (map.InBounds(newPoint) && map[newPoint.X, newPoint.Y].IsWalkable) {
                 player.Location = newPoint;
+
+                foreach(var gameObject in map.GameObjects.Where(g => g.Location == player.Location)) {
+                    var action = gameObject.GetAction(dir.Type.Opposite());
+                    action.Perform(map, true);
+                }
             }
         }
     }

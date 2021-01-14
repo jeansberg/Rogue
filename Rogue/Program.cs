@@ -41,11 +41,13 @@ namespace Rogue {
             var mapConsole = new MapConsole(map, player);
             var logConsole = new LogConsole();
             var mainConsole = new MainConsole();
+
+            mainConsole.SadComponents.Add(new KeyboardChangeBoard(map, player));
+
             mainConsole.Children.Add(mapConsole);
             mainConsole.Children.Add(logConsole);
 
 
-            mapConsole.SadComponents.Add(new KeyboardChangeBoard(map, player));
 
             SadConsole.Game.Instance.Screen = mainConsole;
         }
