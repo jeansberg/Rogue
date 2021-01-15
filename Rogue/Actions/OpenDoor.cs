@@ -5,15 +5,15 @@ using SadRogue.Primitives;
 
 namespace Rogue.Actions {
     public class OpenDoor : IAction {
-        private Direction.Types fromDirection;
-        private Door door;
+        private readonly Direction.Types fromDirection;
+        private readonly Door door;
 
         public OpenDoor(Direction.Types fromDirection, Door door) {
             this.fromDirection = fromDirection;
             this.door = door;
         }
 
-        public void Perform(RogueMap<MapCell> map, bool defaultAction = false) {
+        public void Perform(RogueMap<MapCell> map, Actor actor, bool defaultAction = false) {
             var newLocation = door.Location.Increment(fromDirection.Opposite());
             if (map.InBounds(newLocation)) {
                 door.Location = newLocation;

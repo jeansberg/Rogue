@@ -24,17 +24,17 @@ namespace Rogue.Graphics {
         public override void Update(TimeSpan delta) {
             if (state == InputState.Idle) {
                 if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Down)) {
-                    MoveActor(Direction.Down);
+                    MoveActor(player, Direction.Down);
                 }
                 else
                 if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Up)) {
-                    MoveActor(Direction.Up);
+                    MoveActor(player, Direction.Up);
                 }
                 else if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Left)) {
-                    MoveActor(Direction.Left);
+                    MoveActor(player, Direction.Left);
                 }
                 else if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Right)) {
-                    MoveActor(Direction.Right);
+                    MoveActor(player, Direction.Right);
                 }
                 else if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Space)) {
                     this.state = InputState.Targeting;
@@ -68,7 +68,7 @@ namespace Rogue.Graphics {
                     state = InputState.Idle;
                     if (gameObject != null) {
                         var action = gameObject.GetAction(direction.Opposite());
-                        action.Perform(map);
+                        action.Perform(map, player);
                     };
                 }
             }
@@ -113,14 +113,14 @@ namespace Rogue.Graphics {
             Cursor.Print(coloredString);
         }
 
-        private void MoveActor(Direction dir) {
-            var newPoint = player.Location.Increment(dir);
+        private void MoveActor(Actor actor, Direction dir) {
+            var newPoint = actor.Location.Increment(dir);
             if (map.InBounds(newPoint) && map[newPoint.X, newPoint.Y].IsWalkable) {
-                player.Location = newPoint;
+                actor.Location = newPoint;
 
-                foreach(var gameObject in map.GameObjects.Where(g => g.Location == player.Location)) {
+                foreach(var gameObject in map.GameObjects.Where(g => g.Location == actor.Location)) {
                     var action = gameObject.GetAction(dir.Type.Opposite());
-                    action.Perform(map, true);
+                    action.Perform(map, actor, true);
                 }
             }
         }

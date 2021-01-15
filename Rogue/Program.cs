@@ -15,7 +15,7 @@ namespace Rogue {
 
         static void Main(string[] args)
         {
-            var generator = new MapGenerator(Width, Height, 30, 3, 9, 3, 9);
+            var generator = new MapGenerator(Width, Height, 50, 3, 9, 3, 9);
 
             map = generator.GenerateMap();
 

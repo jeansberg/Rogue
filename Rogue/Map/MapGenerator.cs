@@ -55,17 +55,17 @@ namespace Rogue {
         }
 
         private void ConnectRooms(RogueMap<MapCell> map) {
-            var potentialConnectorCells = new List<MapCell>();
+            var connectorCandidates = new List<MapCell>();
             foreach (var cell in map.GetAllCells().Where(IsWall())) {
-                if (BetweenMazeAndRoom(cell, map)) {
-                    potentialConnectorCells.Add(cell);
+                if (IsConnectorCandidate(cell, map)) {
+                    connectorCandidates.Add(cell);
                 }
             }
 
             foreach (var room in Rooms) {
                 var connectors = room.Points()
                     .SelectMany(p => map.GetAdjacentCells(p.X, p.Y))
-                    .Where(c => potentialConnectorCells.Contains(c))
+                    .Where(c => connectorCandidates.Contains(c))
                     .ToList();
 
                 if (connectors.Any()) {
@@ -112,13 +112,17 @@ namespace Rogue {
             return connector;
         }
 
-        private bool BetweenMazeAndRoom(MapCell cell, Map<MapCell> map) {
+        private bool IsConnectorCandidate(MapCell cell, Map<MapCell> map) {
             var adjacent = map.GetAdjacentCells(cell.X, cell.Y);
             if (adjacent.Any(adjacent => adjacent.Type == CellType.RoomFloor) 
                 && adjacent.Any(a => a.Type == CellType.Maze)) {
                 return true;
             }
-            
+
+            if (adjacent.Count(a => a.Type == CellType.RoomFloor) > 1) {
+                return true;
+            }
+
             return false;
         }
 
