@@ -40,7 +40,7 @@ namespace Rogue {
         {
             var map = new RogueMap<MapCell>(Width, Height);
             foreach(var cell in map.GetAllCells()) {
-                //cell.Type = CellType.Wall;
+                cell.Type = CellType.Wall;
             }
 
             PlaceRooms(map);
@@ -107,7 +107,7 @@ namespace Rogue {
 
             map.GameObjects.Add(door);
 
-            map.SetCellProperties(connector.X, connector.Y, true, true);
+            map.SetCellProperties(connector.X, connector.Y, false, true);
             
             return connector;
         }

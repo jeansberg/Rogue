@@ -1,4 +1,5 @@
-﻿using Rogue.GameObjects;
+﻿using Rogue.Display;
+using Rogue.GameObjects;
 using Rogue.Graphics;
 using Rogue.MazeGenerator;
 using RogueSharp;
@@ -38,16 +39,14 @@ namespace Rogue {
 
         private static void Init() {
             // Any startup code for your game. We will use an example console for now
-            var mapConsole = new MapConsole(map, player);
+            var mapConsole = new MapConsole(map);
             var logConsole = new LogConsole();
-            var mainConsole = new MainConsole();
-
-            mainConsole.SadComponents.Add(new KeyboardChangeBoard(map, player));
+            var messageConsole = new MessageConsole();
+            var mainConsole = new MainConsole(mapConsole, logConsole, messageConsole, player);
 
             mainConsole.Children.Add(mapConsole);
             mainConsole.Children.Add(logConsole);
-
-
+            mainConsole.Children.Add(messageConsole);
 
             SadConsole.Game.Instance.Screen = mainConsole;
         }

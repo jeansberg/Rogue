@@ -13,17 +13,26 @@ namespace Rogue.Actions {
             this.door = door;
         }
 
-        public void Perform(RogueMap<MapCell> map, Actor actor, bool defaultAction = false) {
+        public bool Perform(RogueMap<MapCell> map, Actor actor, bool defaultAction = false) {
             var newLocation = door.Location.Increment(fromDirection.Opposite());
-            if (map.InBounds(newLocation)) {
-                door.Location = newLocation;
-
-                door.Orientation = door.Orientation == Orientation.Horizontal ?
-                    Orientation.Vertical :
-                    Orientation.Horizontal;
-
-                door.IsOpen = true;
+            if (!map.InBounds(newLocation)) {
+                return false;
             }
+
+            door.Location = newLocation;
+
+            door.Orientation = door.Orientation == Orientation.Horizontal ?
+                Orientation.Vertical :
+                Orientation.Horizontal;
+
+            door.IsOpen = true;
+            map[door.OriginalLocation.X, door.OriginalLocation.Y].IsTransparent = true;
+
+            return true;
+        }
+
+        public override string ToString() {
+            return "Opened door";
         }
     }
 }

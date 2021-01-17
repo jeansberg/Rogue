@@ -19,7 +19,7 @@ namespace Rogue.MazeGenerator {
         public Color Color =>
             Type switch {
             CellType.Wall => Color.Gray,
-            CellType.RoomFloor => Color.Black,
+            CellType.RoomFloor => Color.Gray,
             CellType.Maze => Color.Gray,
             CellType.Connector => Color.Gray,
             CellType.DoorVertical => Color.Brown,
@@ -31,7 +31,7 @@ namespace Rogue.MazeGenerator {
 
         public override string ToString() => Type switch {
             CellType.Wall => "#",
-            CellType.RoomFloor => " ",
+            CellType.RoomFloor => ".",
             CellType.Maze => ".",
             CellType.Connector => "x",
             CellType.DoorVertical => "|",
@@ -42,5 +42,7 @@ namespace Rogue.MazeGenerator {
 
             _ => throw new NotImplementedException()
         };
+
+        public bool Discovered { get; set; }
     }
 }

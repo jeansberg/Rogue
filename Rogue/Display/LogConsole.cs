@@ -1,18 +1,31 @@
 ﻿using System;
+using System.Collections.Generic;
 using SadConsole;
 
 namespace Rogue.Graphics {
     public class LogConsole : SadConsole.Console {
-        public LogConsole() : base(20, 40) {}
+        private readonly Stack<string> messages;
+        public LogConsole() : base(20, 40) {
+            this.Position = new SadRogue.Primitives.Point(60 + 2, 1);
+            messages = new Stack<string>();
+        }
 
         public override void Update(TimeSpan delta) {
             this.Clear();
 
-            this.Position = new SadRogue.Primitives.Point(60 + 2, 1);
             Cursor.Position = new SadRogue.Primitives.Point(0, 0);
             Cursor.Print("Log");
 
+            foreach (var message in messages) {
+                Cursor.NewLine();
+                Cursor.Print(message);
+            }
+
             base.Update(delta);
+        }
+
+        public void Log(string message) {
+            messages.Push(message);
         }
     }
 }
