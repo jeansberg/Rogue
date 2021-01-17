@@ -61,7 +61,7 @@ namespace Rogue.Graphics {
 
             foreach (var cell in map.GetAllCells()) {
                 if (!cell.Discovered) {
-                    DrawEmpty();
+                    SkipCell();
                 } else if(fov.IsInFov(cell.X, cell.Y)) {
                     DrawCell(cell, true);
                 }
@@ -71,7 +71,7 @@ namespace Rogue.Graphics {
             }
         }
 
-        private void DrawEmpty() {
+        private void SkipCell() {
             Cursor.RightWrap(1);
         }
 
@@ -87,7 +87,8 @@ namespace Rogue.Graphics {
             if (map.InBounds(newPoint) && map[newPoint.X, newPoint.Y].IsWalkable) {
                 actor.Location = newPoint;
 
-                foreach(var gameObject in map.GameObjects.Where(g => g.Location == actor.Location)) {
+                var gameObject = map.GameObjects.FirstOrDefault(g => g.Location == newPoint);
+                if (gameObject != null) {
                     var action = gameObject.GetAction(dir.Type.Opposite());
                     if (action.Perform(map, actor, true)) {
                         return action;

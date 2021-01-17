@@ -2,9 +2,12 @@
 using Rogue.MazeGenerator;
 using RogueSharp;
 using SadConsole;
+using SadRogue.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Point = RogueSharp.Point;
+using Rectangle = RogueSharp.Rectangle;
 
 namespace Rogue {
     public class MapGenerator
@@ -45,9 +48,9 @@ namespace Rogue {
 
             PlaceRooms(map);
 
-            var maze = new Maze(map);
+            var maze = new MazeCarver(map);
 
-            maze.CarveMaze(new SadRogue.Primitives.Point(0, 0));
+            maze.CarveMaze(new SadRogue.Primitives.Point(0, 0), Direction.Up);
 
             ConnectRooms(map);
  

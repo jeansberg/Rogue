@@ -1,6 +1,5 @@
 ﻿using Rogue.Display;
 using Rogue.GameObjects;
-using RogueSharp;
 using SadConsole;
 using SadConsole.Input;
 using SadRogue.Primitives;
@@ -25,29 +24,17 @@ namespace Rogue.Graphics {
         public override void Update(TimeSpan delta) {
             if (state == InputState.Idle) {
                 if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Down)) {
-                    var action = mapConsole.MoveActor(player, Direction.Down);
-                    if (action != null) {
-                        logConsole.Log(action.ToString());
-                    }
+                    Move(Direction.Down);
                 }
                 else
                 if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Up)) {
-                    var action = mapConsole.MoveActor(player, Direction.Up);
-                    if (action != null) {
-                        logConsole.Log(action.ToString());
-                    }
+                    Move(Direction.Up);
                 }
                 else if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Left)) {
-                    var action = mapConsole.MoveActor(player, Direction.Left);
-                    if (action != null) {
-                        logConsole.Log(action.ToString());
-                    }
+                    Move(Direction.Left);
                 }
                 else if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Right)) {
-                    var action = mapConsole.MoveActor(player, Direction.Right);
-                    if (action != null) {
-                        logConsole.Log(action.ToString());
-                    }
+                    Move(Direction.Right);
                 }
                 else if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Space)) {
                     state = InputState.Targeting;
@@ -58,32 +45,42 @@ namespace Rogue.Graphics {
 
                 Direction.Types direction = Direction.None;
                 if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Down)) {
-                    direction = Direction.Types.Down;
+                    Target(Direction.Down);
                 }
                 else if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Up)) {
-                    direction = Direction.Types.Up;
+                    Target(Direction.Up);
                 }
                 else if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Left)) {
-                    direction = Direction.Types.Left;
+                    Target(Direction.Left);
                 }
                 else if (GameHost.Instance.Keyboard.IsKeyPressed(Keys.Right)) {
-                    direction = Direction.Types.Right;
+                    Target(Direction.Right);
                 }
 
-                if (direction != Direction.Types.None) {
-                    var action = mapConsole.Act(player, direction);
-                    if (action != null) {
-                        logConsole.Log(action.ToString());
-                    }
-
-                    state = InputState.Idle;
-                    messageConsole.SetMessage("");
-                }
             }
 
             mapConsole.Update(player, delta);
             messageConsole.Update(delta);
             logConsole.Update(delta);
+        }
+
+        private void Target(Direction.Types direction) {
+            if (direction != Direction.Types.None) {
+                var action = mapConsole.Act(player, direction);
+                if (action != null) {
+                    logConsole.Log(action.ToString());
+                }
+
+                state = InputState.Idle;
+                messageConsole.SetMessage("");
+            }
+        }
+
+        private void Move(Direction direction) {
+            var action = mapConsole.MoveActor(player, direction);
+            if (action != null) {
+                logConsole.Log(action.ToString());
+            }
         }
     }
 }

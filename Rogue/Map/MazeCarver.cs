@@ -7,16 +7,16 @@ using static SadRogue.Primitives.Direction;
 
 namespace Rogue.MazeGenerator {
 
-    public class Maze {
+    public class MazeCarver {
         private readonly RogueMap<MapCell> map;
         private List<Point> visitedPoints;
 
-        public Maze(RogueMap<MapCell> map) {
+        public MazeCarver(RogueMap<MapCell> map) {
             visitedPoints = new List<SadRogue.Primitives.Point>();
             this.map = map;
         }
 
-        public void CarveMaze(Point point) {
+        public void CarveMaze(Point point, Direction direction) {
             visitedPoints.Add(point);
             map.SetCellProperties(point.X, point.Y, true, true);
 
@@ -28,7 +28,7 @@ namespace Rogue.MazeGenerator {
             foreach (var dir in directions) {
                 var nextPoint = point.Increment(dir);
                 if (IsValid(nextPoint, dir)) {
-                    CarveMaze(nextPoint);
+                    CarveMaze(nextPoint, dir);
                 }
             }
         }
