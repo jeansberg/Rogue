@@ -2,7 +2,6 @@
 using Rogue.GameObjects;
 using Rogue.Graphics;
 using Rogue.MazeGenerator;
-using RogueSharp;
 using SadRogue.Primitives;
 using System.Collections.Generic;
 
@@ -16,11 +15,11 @@ namespace Rogue {
 
         static void Main(string[] args)
         {
-            var generator = new MapGenerator(Width, Height, 50, 3, 9, 3, 9);
+            var generator = new MapGenerator(new Map.RoomDecorator(), Width, Height, 50, 3, 9, 3, 9);
 
             map = generator.GenerateMap();
 
-            player = new Player(new SadRogue.Primitives.Point(0, 0), Color.Yellow);
+            player = new Player(new Point(0, 0), Color.Yellow);
 
             var actors = new List<Actor> {
                 player
