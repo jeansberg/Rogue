@@ -1,14 +1,14 @@
-﻿using Rogue.GameObjects;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Rogue.GameObjects;
 using Rogue.Map;
 using Rogue.MazeGenerator;
 using RogueSharp;
 using SadConsole;
 using SadRogue.Primitives;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Point = RogueSharp.Point;
-using Rectangle = RogueSharp.Rectangle;
+using Rectangle = SadRogue.Primitives.Rectangle;
+using Point = SadRogue.Primitives.Point;
 
 namespace Rogue {
     public class MapGenerator
@@ -57,7 +57,7 @@ namespace Rogue {
         }
 
         private void DecorateRooms(RogueMap<MapCell> map) {
-            var decorations = roomDecorator.GetDecorations(Rooms);
+            roomDecorator.GetDecorations(Rooms, map.GameObjects, Rnd);
         }
 
         private void ConnectRooms(RogueMap<MapCell> map) {
@@ -70,7 +70,7 @@ namespace Rogue {
 
             foreach (var room in Rooms) {
                 var bounds = room.Bounds;
-                var connectors = bounds.Points()
+                var connectors = bounds.Positions()
                     .SelectMany(p => map.GetAdjacentCells(p.X, p.Y))
                     .Where(c => connectorCandidates.Contains(c))
                     .ToList();
@@ -82,7 +82,7 @@ namespace Rogue {
                     if (connectors.Count > 1 && Rnd.Next(0, 2) == 1) {
                         connectors.Remove(connector);
                         var secondConnector = connectors[Rnd.Next(0, connectors.Count)];
-                        if (map.GetAdjacentCells(secondConnector.X, secondConnector.Y).Any(IsDoor())) {
+                        if (map.GetAdjacentCells(secondConnector.X, secondConnector.Y).Any(HasDoor(map))) {
                             continue;
                         }
                         CreateDoor(map, bounds, secondConnector);
@@ -90,25 +90,22 @@ namespace Rogue {
                 }
                 else {
                     // Remove non-connected room
-                    // Todo: Fix this
-                    var walls = bounds.Points().SelectMany(r => map.GetAdjacentCells(r.X, r.Y, true))
-                        .Select(c => new Point(c.X, c.Y));
-
-                    bounds.Points()
-                        .Concat(walls)
+                    // Todo: Fix the maze generation issue that causes this
+                    bounds.Expand(2, 2).Positions()
                         .ToList()
                         .ForEach(p =>
                     {
                         var mapCell = map[p.X, p.Y];
                         mapCell.Type = CellType.Wall;
+                        map.GameObjects.RemoveAll(g => g.Location == new Point(mapCell.X, mapCell.Y));
                     });
                 }
             }
 
         }
 
-        private static Func<MapCell, bool> IsDoor() {
-            return c => c.Type == CellType.DoorHorizontal || c.Type == CellType.DoorVertical;
+        private static Func<MapCell, bool> HasDoor(RogueMap<MapCell> map) {
+            return c => map.GameObjects.Any(g => g is Door && g.Location.X == c.X && g.Location.Y == c.Y);
         }
 
         private static Func<MapCell, bool> IsWall() {
@@ -119,7 +116,7 @@ namespace Rogue {
             connector.Type = CellType.Maze;
             var door = new Door(
                 new SadRogue.Primitives.Point(connector.X, connector.Y), 
-                (connector.X == room.Left - 1 || connector.X == room.Right) ? Orientation.Vertical : Orientation.Horizontal);
+                (connector.X == room.X - 1 || connector.X == room.MaxExtentX + 1) ? Orientation.Vertical : Orientation.Horizontal);
 
             map.GameObjects.Add(door);
 
@@ -173,8 +170,7 @@ namespace Rogue {
             foreach(var room in Rooms)
             {
                 var bounds = room.Bounds;
-                if (newRoom.Touches(bounds, 2) ||
-                    bounds.Touches(newRoom, 2))
+                if (newRoom.Expand(4, 4).Intersects(bounds))
                 {
                     return true;
                 }

@@ -25,6 +25,13 @@ namespace Rogue.Actions {
                 Orientation.Vertical :
                 Orientation.Horizontal;
 
+            if (door.Orientation == SadConsole.Orientation.Vertical) {
+                door.GlyphId = 179;
+            }
+            else {
+                door.GlyphId = 196;
+            }
+
             door.IsOpen = true;
             map[door.OriginalLocation.X, door.OriginalLocation.Y].IsTransparent = true;
 

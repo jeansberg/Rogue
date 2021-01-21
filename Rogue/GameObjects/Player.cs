@@ -2,10 +2,8 @@
 
 namespace Rogue.GameObjects {
     public class Player : Actor {
-        public Player(Point location, Color color) : base(location, color) {
+        public Player(Point location, Color color) : base(location, color, 64) {
         }
-
-        public override string ToString() => "@";
     };
 }
 

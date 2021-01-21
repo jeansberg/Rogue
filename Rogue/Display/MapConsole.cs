@@ -2,6 +2,7 @@
 using Rogue.MazeGenerator;
 using RogueSharp;
 using SadConsole;
+using SadConsole.Host;
 using SadRogue.Primitives;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,8 @@ namespace Rogue.Graphics {
         private FieldOfView<MapCell> fov;
 
         public MapConsole(RogueMap<MapCell> map) : base(map.Width, map.Height + 1) {
+            this.Font = new Font(12, 12, 0, 16, 16, 0, new GameTexture(new SFML.Graphics.Texture("../../../Cheepicus_12x12.png")), "mapFont");
+
             this.map = map;
             this.Position = new SadRogue.Primitives.Point(1, 1);
             fov = new FieldOfView<MapCell>(map);
@@ -38,11 +41,11 @@ namespace Rogue.Graphics {
         private void DrawObjects() {
             foreach(var gameObject in map.GameObjects) {
                 var cell = map[gameObject.Location.X, gameObject.Location.Y];
-                if (!fov.IsInFov(cell.X, cell.Y)) {
-                    continue;
-                }
+                //if (!fov.IsInFov(cell.X, cell.Y)) {
+                //    continue;
+                //}
 
-                var coloredString = new ColoredString(gameObject.ToString(), gameObject.Color, Color.Black);
+                var coloredString = new ColoredString(new ColoredGlyph(gameObject.Color, Color.Black, gameObject.GlyphId));
 
                 Cursor.Position = new SadRogue.Primitives.Point(cell.X, cell.Y);
                 Cursor.Print(coloredString);
@@ -50,9 +53,10 @@ namespace Rogue.Graphics {
         }
 
         private void DrawPlayer(Player player) {
-            var coloredString = new ColoredString(player.ToString(), player.Color, Color.Black);
+            var coloredString = new ColoredString(new ColoredGlyph(player.Color, Color.Black, player.GlyphId));
 
             Cursor.Position = new SadRogue.Primitives.Point(player.Location.X, player.Location.Y);
+
             Cursor.Print(coloredString);
         }
 
@@ -61,8 +65,9 @@ namespace Rogue.Graphics {
 
             foreach (var cell in map.GetAllCells()) {
                 if (!cell.Discovered) {
-                    SkipCell();
-                } else if(fov.IsInFov(cell.X, cell.Y)) {
+                    DrawCell(cell, true);
+                }
+                else if(fov.IsInFov(cell.X, cell.Y)) {
                     DrawCell(cell, true);
                 }
                 else {
@@ -78,7 +83,7 @@ namespace Rogue.Graphics {
         private void DrawCell(MapCell cell, bool inFov) {
             var foreground = inFov ? cell.Color : cell.Color.GetDarker();
             var background = Color.Black;
-            var coloredString = new ColoredString(cell.ToString(), foreground, background);
+            var coloredString = new ColoredString(new ColoredGlyph(foreground, background, cell.GlyphId));
             Cursor.Print(coloredString);
         }
 

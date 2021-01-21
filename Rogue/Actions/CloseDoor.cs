@@ -19,6 +19,13 @@ namespace Rogue.Actions {
             }
 
             door.Orientation = door.OriginalOrientation;
+            if (door.Orientation == SadConsole.Orientation.Vertical) {
+                door.GlyphId = 179;
+            }
+            else {
+                door.GlyphId = 196;
+            }
+
             door.Location = door.OriginalLocation;
 
             door.IsOpen = false;

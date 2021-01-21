@@ -6,7 +6,7 @@ namespace Rogue.Graphics {
     public class LogConsole : SadConsole.Console {
         private readonly Stack<string> messages;
         public LogConsole() : base(20, 40) {
-            this.Position = new SadRogue.Primitives.Point(60 + 2, 1);
+            this.Position = new SadRogue.Primitives.Point(90 + 2, 1);
             messages = new Stack<string>();
         }
 

@@ -26,7 +26,7 @@ namespace Rogue {
             };
 
             // Setup the engine and create the main window.
-            SadConsole.Game.Create(Width + 20 + 2, Height + 2);
+            SadConsole.Game.Create((int)(Width * 2) + 20 + 2, Height + 2);
 
             // Hook the start event so we can add consoles to the system.
             SadConsole.Game.Instance.OnStart = Init;

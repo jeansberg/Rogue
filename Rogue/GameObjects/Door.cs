@@ -4,7 +4,7 @@ using SadRogue.Primitives;
 
 namespace Rogue.GameObjects {
     public class Door : GameObject {
-        public Door(Point location, Orientation orientation) : base(location, Color.SaddleBrown) {
+        public Door(Point location, Orientation orientation) : base(location, Color.SaddleBrown, orientation == Orientation.Vertical ? 179 : 196) {
             Orientation = orientation;
             IsOpen = false;
             OriginalOrientation = orientation;
@@ -25,11 +25,5 @@ namespace Rogue.GameObjects {
 
             return new OpenDoor(fromDirection, this);
         }
-
-        public override string ToString() => Orientation switch {
-            Orientation.Horizontal => "-",
-            Orientation.Vertical => "|",
-            _ => throw new System.NotImplementedException()
-        };
     }
 }

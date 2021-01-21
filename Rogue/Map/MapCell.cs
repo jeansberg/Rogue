@@ -29,15 +29,13 @@ namespace Rogue.MazeGenerator {
                 _ => throw new NotImplementedException()
         };
 
-        public override string ToString() => Type switch {
-            CellType.Wall => "#",
-            CellType.RoomFloor => ".",
-            CellType.Maze => ".",
-            CellType.Connector => "x",
-            CellType.DoorVertical => "|",
-            CellType.DoorHorizontal => "-",
-            CellType.RoomWallVertical => "|",
-            CellType.RoomWallHorizontal => "-",
+        public int GlyphId => Type switch {
+            CellType.Wall => 254,
+            CellType.RoomFloor => 46,
+            CellType.Maze => 46,
+            CellType.Connector => 120,
+            CellType.RoomWallVertical => 186,
+            CellType.RoomWallHorizontal => 205,
 
 
             _ => throw new NotImplementedException()

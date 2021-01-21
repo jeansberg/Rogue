@@ -1,6 +1,7 @@
 ﻿using Rogue.Display;
 using Rogue.GameObjects;
 using SadConsole;
+using SadConsole.Host;
 using SadConsole.Input;
 using SadRogue.Primitives;
 using System;

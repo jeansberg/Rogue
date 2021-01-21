@@ -1,4 +1,4 @@
-﻿using RogueSharp;
+﻿using SadRogue.Primitives;
 using System.Collections.Generic;
 
 namespace Rogue
@@ -7,10 +7,10 @@ namespace Rogue
     {
         public static bool Touches(this Rectangle rect1, Rectangle rect2, int margin)
         {
-            return rect2.Left <= rect1.Right - margin &&
-                rect1.Left < rect2.Right + margin &&
-                rect2.Top < rect1.Bottom + margin &&
-                rect1.Top <= rect2.Bottom - margin;
+            return rect2.X <= rect1.MaxExtentX - margin &&
+                rect1.X < rect2.MaxExtentX + margin &&
+                rect2.Y < rect1.MaxExtentY + margin &&
+                rect1.Y <= rect2.MaxExtentY - margin;
         }
 
         public static List<Point> Points(this Rectangle rect) {
