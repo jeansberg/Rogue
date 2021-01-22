@@ -2,6 +2,6 @@
 
 namespace Rogue.GameObjects {
     public interface IHasAction {
-        IAction GetAction(Direction.Types from);
+        IAction GetAction(RogueMap<MazeGenerator.MapCell> map, Direction.Types from);
     }
 }

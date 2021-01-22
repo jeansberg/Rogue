@@ -11,19 +11,20 @@ namespace Rogue {
         private const int Width = 60;
         private const int Height = 40;
         private static RogueMap<MapCell> map;
-        private static Player player;
+        private static List<Actor> actors;
 
         static void Main(string[] args)
         {
-            var generator = new MapGenerator(new Map.RoomDecorator(), Width, Height, 50, 3, 9, 3, 9);
+            var generator = new MapGenerator(new Map.RoomDecorator(), Width, Height, 100, 3, 9, 3, 9);
 
             map = generator.GenerateMap();
+            
+            var player = new Player(new Point(0, 0), Color.Yellow, new RogueSharp.FieldOfView<MapCell>(map));
 
-            player = new Player(new Point(0, 0), Color.Yellow);
-
-            var actors = new List<Actor> {
-                player
+            actors = new List<Actor> {
+                player,
             };
+            actors.AddRange(map.Actors);
 
             // Setup the engine and create the main window.
             SadConsole.Game.Create((int)(Width * 2) + 20 + 2, Height + 2);
@@ -38,10 +39,10 @@ namespace Rogue {
 
         private static void Init() {
             // Any startup code for your game. We will use an example console for now
-            var mapConsole = new MapConsole(map);
+            var mapConsole = new MapConsole(map, true);
             var logConsole = new LogConsole();
             var messageConsole = new MessageConsole();
-            var mainConsole = new MainConsole(mapConsole, logConsole, messageConsole, player);
+            var mainConsole = new MainConsole(mapConsole, logConsole, messageConsole, actors);
 
             mainConsole.Children.Add(mapConsole);
             mainConsole.Children.Add(logConsole);

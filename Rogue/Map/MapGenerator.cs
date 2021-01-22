@@ -23,6 +23,7 @@ namespace Rogue {
 
         public Random Rnd { get; }
         private List<Room> Rooms;
+
         private readonly RoomDecorator roomDecorator;
 
         public MapGenerator(RoomDecorator roomDecorator, int width, int height, int roomAttempts, int roomMinWidth, int roomMaxWidth, int roomMinHeight, int roomMaxHeight) {
@@ -52,8 +53,28 @@ namespace Rogue {
 
             ConnectRooms(map);
             DecorateRooms(map);
+            PlaceMonsters(map);
  
             return map;
+        }
+
+        private void PlaceMonsters(RogueMap<MapCell> map) {
+            map.Actors = new List<Actor>();
+            foreach(var room in Rooms) {
+                SpawnMonster(room, map);
+            }
+        }
+
+        private void SpawnMonster(Room room, RogueMap<MapCell> map) {
+            Point location;
+            do {
+                var x = Rnd.Next(room.Bounds.X, room.Bounds.MaxExtentX);
+                var y = Rnd.Next(room.Bounds.Y, room.Bounds.MaxExtentY);
+                location = new Point(x, y);
+            }
+            while (map.GameObjects.Any(global => global.Location == location));
+
+            map.Actors.Add(new Monster(location, Color.Green, 2, 2, "Monster", new RogueSharp.FieldOfView<MapCell>(map)));
         }
 
         private void DecorateRooms(RogueMap<MapCell> map) {
@@ -93,11 +114,12 @@ namespace Rogue {
                     // Todo: Fix the maze generation issue that causes this
                     bounds.Expand(2, 2).Positions()
                         .ToList()
-                        .ForEach(p =>
-                    {
-                        var mapCell = map[p.X, p.Y];
-                        mapCell.Type = CellType.Wall;
-                        map.GameObjects.RemoveAll(g => g.Location == new Point(mapCell.X, mapCell.Y));
+                        .ForEach(p => {
+                            if (map.InBounds(p)) {
+                                var mapCell = map[p.X, p.Y];
+                                mapCell.Type = CellType.Wall;
+                                map.GameObjects.RemoveAll(g => g.Location == new Point(mapCell.X, mapCell.Y));
+                        }
                     });
                 }
             }
@@ -160,9 +182,11 @@ namespace Rogue {
 
             var upOrDown = Rnd.Next(0, 2);
 
-            number = upOrDown == 0 ? number++ : number--;
+            number = number % 2 == 0 ? 
+                (upOrDown == 0 ? number++ : number--) :
+                number;
 
-            return Math.Clamp(number, 0, max);
+            return Math.Clamp(number, 1, max);
         }
 
         private bool OverLapsRoom(Rectangle newRoom)

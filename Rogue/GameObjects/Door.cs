@@ -4,7 +4,7 @@ using SadRogue.Primitives;
 
 namespace Rogue.GameObjects {
     public class Door : GameObject {
-        public Door(Point location, Orientation orientation) : base(location, Color.SaddleBrown, orientation == Orientation.Vertical ? 179 : 196) {
+        public Door(Point location, Orientation orientation) : base(location, Color.SaddleBrown, orientation == Orientation.Vertical ? 179 : 196, "door") {
             Orientation = orientation;
             IsOpen = false;
             OriginalOrientation = orientation;
@@ -18,12 +18,12 @@ namespace Rogue.GameObjects {
 
         public bool IsOpen { get; set; }
 
-        public override IAction GetAction(Direction.Types fromDirection) {
+        public override IAction GetAction(RogueMap<MazeGenerator.MapCell> map, Direction.Types fromDirection) {
             if (IsOpen) {
-                return new CloseDoor(this); 
+                return new CloseDoor(this, map); 
             }
 
-            return new OpenDoor(fromDirection, this);
+            return new OpenDoor(fromDirection, this, map);
         }
     }
 }

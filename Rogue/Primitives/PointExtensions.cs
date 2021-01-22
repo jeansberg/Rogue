@@ -15,5 +15,8 @@ namespace Rogue {
             Direction.Types.Left => new Point(point.X - 1, point.Y),
             _ => throw new NotImplementedException(),
         };
+
+        public static bool IsAdjacent(this Point point, Point otherPoint) => 
+            Math.Abs(point.X - otherPoint.X) + Math.Abs(point.Y - otherPoint.Y) == 1;
     }
 }
