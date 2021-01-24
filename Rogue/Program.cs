@@ -1,6 +1,5 @@
-﻿using Rogue.Display;
+﻿using Rogue.Consoles;
 using Rogue.GameObjects;
-using Rogue.Graphics;
 using Rogue.MazeGenerator;
 using SadRogue.Primitives;
 using System.Collections.Generic;

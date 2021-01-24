@@ -89,6 +89,7 @@ namespace Rogue {
                 }
             }
 
+            var roomsToDelete = new List<Room>();
             foreach (var room in Rooms) {
                 var bounds = room.Bounds;
                 var connectors = bounds.Positions()
@@ -112,18 +113,21 @@ namespace Rogue {
                 else {
                     // Remove non-connected room
                     // Todo: Fix the maze generation issue that causes this
+                    roomsToDelete.Add(room);
+
                     bounds.Expand(2, 2).Positions()
                         .ToList()
                         .ForEach(p => {
                             if (map.InBounds(p)) {
                                 var mapCell = map[p.X, p.Y];
                                 mapCell.Type = CellType.Wall;
+                                map.SetCellProperties(p.X, p.Y, false, false);
                                 map.GameObjects.RemoveAll(g => g.Location == new Point(mapCell.X, mapCell.Y));
                         }
                     });
                 }
             }
-
+            Rooms.RemoveAll(r => roomsToDelete.Contains(r));
         }
 
         private static Func<MapCell, bool> HasDoor(RogueMap<MapCell> map) {

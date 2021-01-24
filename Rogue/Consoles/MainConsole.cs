@@ -1,5 +1,4 @@
-﻿using Rogue.Display;
-using Rogue.GameObjects;
+﻿using Rogue.GameObjects;
 using SadConsole;
 using SadConsole.Host;
 using SadConsole.Input;
@@ -9,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Console = SadConsole.Console;
 
-namespace Rogue.Graphics {
+namespace Rogue.Consoles {
     public class MainConsole : Console {
         private readonly MapConsole mapConsole;
         private readonly LogConsole logConsole;
@@ -23,7 +22,7 @@ namespace Rogue.Graphics {
             this.logConsole = logConsole;
             this.messageConsole = messageConsole;
             this.actors = actors;
-            this.player = actors.Single(a => a is Player);
+            player = actors.Single(a => a is Player);
         }
 
         public override void Update(TimeSpan delta) {
@@ -39,7 +38,7 @@ namespace Rogue.Graphics {
         }
 
         private void UpdateActors() {
-            foreach (var actor in actors.Where(a => a != player)) {
+            foreach (var actor in actors.Where(a => a != player && a.IsAlive)) {
                 actor.Fov.ComputeFov(actor.Location.X, actor.Location.Y, 5, true);
                 if (player.IsAlive && actor.Fov.IsInFov(player.Location.X, player.Location.Y)) {
                     MoveTo(actor, player.Location);

@@ -1,12 +1,12 @@
 ﻿using System;
 using SadConsole;
 
-namespace Rogue.Display {
+namespace Rogue.Consoles {
     public class MessageConsole : SadConsole.Console {
         private string message = "";
 
         public MessageConsole() : base(40, 1) {
-            this.Position = new SadRogue.Primitives.Point(0, 0);
+            Position = new SadRogue.Primitives.Point(0, 0);
         }
 
         public void SetMessage(string message) {

@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Point = SadRogue.Primitives.Point;
 
-namespace Rogue.Graphics {
+namespace Rogue.Consoles {
     public class MapConsole : SadConsole.Console {
         private readonly RogueMap<MapCell> map;
         private readonly bool showEverything;
@@ -37,75 +37,10 @@ namespace Rogue.Graphics {
                 .ForEach(x => x.Discovered = true);
 
             DrawMap(player.Fov);
-            DrawObjects(player.Fov);
-            DrawActors(actors, player.Fov);
+            DrawGameObjects(map.GameObjects ,player.Fov);
+            DrawGameObjects(actors.Where(a => a.IsAlive), player.Fov);
 
             base.Update(delta);
-        }
-
-        private void DrawObjects(FieldOfView<MapCell> fov) {
-            foreach(var gameObject in map.GameObjects) {
-                var cell = map[gameObject.Location.X, gameObject.Location.Y];
-                if (GetVisibility(cell, fov) != Visibility.InFov) {
-                    continue;
-                }
-
-                var coloredString = new ColoredString(new ColoredGlyph(gameObject.Color, Color.Black, gameObject.GlyphId));
-
-                Cursor.Position = new SadRogue.Primitives.Point(cell.X, cell.Y);
-                Cursor.Print(coloredString);
-            }
-        }
-
-        private Visibility GetVisibility(MapCell cell, FieldOfView<MapCell> fov) {
-            if (showEverything || fov.IsInFov(cell.X, cell.Y)) {
-                return Visibility.InFov;
-            } else if (cell.Discovered) {
-                return Visibility.Discovered;
-            }
-
-            return Visibility.Hidden;
-        }
-
-        private void DrawActors(List<Actor> actors, FieldOfView<MapCell> fov) {
-            foreach (var actor in actors.Where(a => a.IsAlive)) {
-                var cell = map[actor.Location.X, actor.Location.Y];
-                if (GetVisibility(cell, fov) != Visibility.InFov) {
-                    continue;
-                }
-
-                var coloredString = new ColoredString(new ColoredGlyph(actor.Color, Color.Black, actor.GlyphId));
-
-                Cursor.Position = new SadRogue.Primitives.Point(cell.X, cell.Y);
-                Cursor.Print(coloredString);
-            }
-        }
-
-        private void DrawMap(FieldOfView<MapCell> fov) {
-            Cursor.Position = new SadRogue.Primitives.Point(0, 0);
-
-            foreach (var cell in map.GetAllCells()) {
-                if (GetVisibility(cell, fov) == Visibility.InFov) {
-                    DrawCell(cell, true);
-                }
-                else if (GetVisibility(cell, fov) == Visibility.Discovered) {
-                    DrawCell(cell, false);
-                }
-                else {
-                    SkipCell();
-                }
-            }
-        }
-
-        private void SkipCell() {
-            Cursor.RightWrap(1);
-        }
-
-        private void DrawCell(MapCell cell, bool inFov) {
-            var foreground = inFov ? cell.Color : cell.Color.GetDarker();
-            var background = Color.Black;
-            var coloredString = new ColoredString(new ColoredGlyph(foreground, background, cell.GlyphId));
-            Cursor.Print(coloredString);
         }
 
         public bool MoveActor(Actor actor, Direction dir) {
@@ -164,6 +99,39 @@ namespace Rogue.Graphics {
             }
 
             return null;
+        }
+
+        private void DrawGameObjects(IEnumerable<GameObject> gameObjects, FieldOfView<MapCell> fov) {
+            foreach (var gameObject in gameObjects) {
+                var cell = map[gameObject.Location.X, gameObject.Location.Y];
+                var visibility = GetVisibility(cell, fov);
+
+                this.Draw(gameObject, visibility);
+            }
+        }
+
+        private void DrawMap(FieldOfView<MapCell> fov) {
+            Cursor.Position = new SadRogue.Primitives.Point(0, 0);
+
+            foreach (var cell in map.GetAllCells()) {
+                var visibility = GetVisibility(cell, fov);
+                this.Draw(cell, visibility);
+            }
+        }
+
+        private Visibility GetVisibility(MapCell cell, FieldOfView<MapCell> fov) {
+            if (showEverything || fov.IsInFov(cell.X, cell.Y)) {
+                return Visibility.InFov;
+            }
+            else if (cell.Discovered) {
+                return Visibility.Discovered;
+            }
+
+            return Visibility.Hidden;
+        }
+
+        private void SkipCell() {
+            Cursor.RightWrap(1);
         }
     }
 }
