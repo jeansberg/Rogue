@@ -1,4 +1,5 @@
 ﻿using Rogue.GameObjects;
+using Rogue.Map;
 using Rogue.MazeGenerator;
 using Rogue.Primitives;
 using RogueSharp;
@@ -8,6 +9,7 @@ using SadConsole.Host;
 using SadRogue.Primitives;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Point = SadRogue.Primitives.Point;
 
@@ -43,23 +45,35 @@ namespace Rogue.Consoles {
             base.Update(delta);
         }
 
-        public bool MoveActor(Actor actor, Direction dir) {
+        public bool MoveActor(Actor actor, List<Actor> actors, Direction dir) {
             var newPoint = actor.Location.Increment(dir);
             if (!map.InBounds(newPoint) || !map[newPoint.X, newPoint.Y].IsWalkable) {
                 return false;
             }
 
             actor.Location = newPoint;
+
+            var actorLocations = actors.Where(a => a.IsAlive).GroupBy(a => a.Location);
+            Debug.Assert(actorLocations.All(al => al.Count() < 2));
+
             return true;
         }
 
-        public Point NextStep(Actor actor, Point target) {
-            var pathFinder = new AStarShortestPath<MapCell>();
-            var path = pathFinder.FindPath(map[actor.Location.X, actor.Location.Y], map[target.X, target.Y], map);
+        public Point GetNextStep(Actor actor, List<Actor> actors, Point target) {
+            var pathFinder = new AStarHacked<MapCell>();
+            var path = pathFinder.FindPath(map[actor.Location.X, actor.Location.Y], map[target.X, target.Y], map, ValidStep);
             var step = path[1];
+
+            bool ValidStep<TCell>(TCell cell, TCell destination) where TCell : ICell {
+                var reachedDestination = cell.X == destination.X && cell.Y == destination.Y;
+                var cellIsOccupied = actors.Any(a => a != actor && a.Location == new Point(cell.X, cell.Y));
+                return reachedDestination ||
+                    (cell.IsWalkable && !cellIsOccupied);
+            }
 
             return new Point(step.X, step.Y);
         }
+
 
         public IAction Act(Actor actor, Direction.Types direction) {
             var gameObject = map.GameObjects.FirstOrDefault(g => g.Location == actor.Location.Increment(direction));
