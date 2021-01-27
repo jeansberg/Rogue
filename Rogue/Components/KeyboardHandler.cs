@@ -14,13 +14,15 @@ namespace Rogue.Components {
         private MapConsole mapConsole;
         private readonly LogConsole logConsole;
         private Actor player;
+        private readonly InventoryConsole inventory;
         private List<Actor> actors;
 
-        public KeyboardHandler(MapConsole mapConsole, LogConsole logConsole, MessageConsole messageConsole, Actor player, List<Actor> actors) {
+        public KeyboardHandler(MapConsole mapConsole, LogConsole logConsole, MessageConsole messageConsole, Actor player, InventoryConsole inventory, List<Actor> actors) {
             this.mapConsole = mapConsole;
             this.logConsole = logConsole;
             this.messageConsole = messageConsole;
             this.player = player;
+            this.inventory = inventory;
             this.actors = actors;
 
             state = InputState.Idle;
@@ -48,6 +50,13 @@ namespace Rogue.Components {
                 if (info.IsKeyPressed(Keys.Space)) {
                     state = InputState.Targeting;
                 }
+                if (info.IsKeyPressed(Keys.I)) {
+                    state = InputState.Inventory;
+                    inventory.IsVisible = true;
+                    mapConsole.IsVisible = false;
+                    messageConsole.IsVisible = false;
+                    logConsole.IsVisible = false;
+                }
             }
             else if (state == InputState.Targeting) {
                 messageConsole.SetMessage("Select a target");
@@ -67,6 +76,15 @@ namespace Rogue.Components {
                 if (info.IsKeyPressed(Keys.Right)) {
                     Target(Direction.Right);
                     playerMoved = true;
+                }
+            }
+            else if (state == InputState.Inventory) {
+                if (info.IsKeyPressed(Keys.I)) {
+                    state = InputState.Idle;
+                    mapConsole.IsVisible = true;
+                    messageConsole.IsVisible = true;
+                    logConsole.IsVisible = true;
+                    inventory.IsVisible = false;
                 }
             }
 

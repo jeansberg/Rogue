@@ -3,6 +3,7 @@ using Rogue.GameObjects;
 using Rogue.MazeGenerator;
 using SadRogue.Primitives;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Rogue {
     class Program
@@ -41,11 +42,13 @@ namespace Rogue {
             var mapConsole = new MapConsole(map, true);
             var logConsole = new LogConsole();
             var messageConsole = new MessageConsole();
-            var mainConsole = new MainConsole(mapConsole, logConsole, messageConsole, actors);
+            var inventory = new InventoryConsole(actors.Single(a => a is Player));
+            var mainConsole = new MainConsole(mapConsole, logConsole, messageConsole, inventory, actors);
 
             mainConsole.Children.Add(mapConsole);
             mainConsole.Children.Add(logConsole);
             mainConsole.Children.Add(messageConsole);
+            mainConsole.Children.Add(inventory);
 
             SadConsole.Game.Instance.Screen = mainConsole;
         }

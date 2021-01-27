@@ -31,15 +31,18 @@ namespace Rogue.Map {
             var table = new Table(midPoint);
             var chairLeft = new Chair(midPoint.Left());
             var chairRight = new Chair(midPoint.Right());
+            var sword = new Sword(new Point(room.Bounds.X, room.Bounds.MaxExtentY));
 
-            return new List<GameObject> { table, chairLeft, chairRight };
+
+            return new List<GameObject> { table, chairLeft, chairRight, sword };
         }
 
         private List<GameObject> GetDecorationsMediumRoom(Room room, List<GameObject> gameObjects) {
             var topLeftCorner = new Point(room.Bounds.X, room.Bounds.Y);
             var chair = new Chair(topLeftCorner);
+            var sword = new Sword(new Point(room.Bounds.X, room.Bounds.MaxExtentY));
 
-            return new List<GameObject> { chair };
+            return new List<GameObject> { chair, sword };
         }
 
         private List<GameObject> GetDecorationsSmallRoom(Room room, List<GameObject> gameObjects) {
