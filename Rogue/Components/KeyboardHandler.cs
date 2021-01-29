@@ -38,18 +38,18 @@ namespace Rogue.Components {
                 if (info.IsKeyPressed(Keys.Up)) {
                     MovePlayer(Direction.Up);
                     playerMoved = true;
-                }
+                } else
                 if (info.IsKeyPressed(Keys.Left)) {
                     MovePlayer(Direction.Left);
                     playerMoved = true;
-                }
+                } else
                 if (info.IsKeyPressed(Keys.Right)) {
                     MovePlayer(Direction.Right);
                     playerMoved = true;
-                }
+                } else
                 if (info.IsKeyPressed(Keys.Space)) {
                     state = InputState.Targeting;
-                }
+                } else
                 if (info.IsKeyPressed(Keys.I)) {
                     state = InputState.Inventory;
                     inventory.IsVisible = true;
@@ -64,15 +64,15 @@ namespace Rogue.Components {
                 if (info.IsKeyPressed(Keys.Down)) {
                     Target(Direction.Down);
                     playerMoved = true;
-                }
+                } else
                 if (info.IsKeyPressed(Keys.Up)) {
                     Target(Direction.Up);
                     playerMoved = true;
-                }
+                } else
                 if (info.IsKeyPressed(Keys.Left)) {
                     Target(Direction.Left);
                     playerMoved = true;
-                }
+                } else
                 if (info.IsKeyPressed(Keys.Right)) {
                     Target(Direction.Right);
                     playerMoved = true;
@@ -80,12 +80,17 @@ namespace Rogue.Components {
             }
             else if (state == InputState.Inventory) {
                 if (info.IsKeyPressed(Keys.I)) {
-                    state = InputState.Idle;
-                    mapConsole.IsVisible = true;
-                    messageConsole.IsVisible = true;
-                    logConsole.IsVisible = true;
-                    inventory.IsVisible = false;
+                    ExitInventory();
                 }
+                else if (info.KeysPressed.Count > 0) {
+                    var item = inventory.GetItem(info.KeysPressed[0].Key);
+                    if (item != null) {
+                        player.Weapon = item;
+                        messageConsole.SetMessage($"{player.Name} Equipped {item.Name}");
+                        ExitInventory();
+                    }
+                }
+
             }
 
             if (playerMoved) {
@@ -93,6 +98,14 @@ namespace Rogue.Components {
             }
 
             handled = true;
+        }
+
+        private void ExitInventory() {
+            state = InputState.Idle;
+            mapConsole.IsVisible = true;
+            messageConsole.IsVisible = true;
+            logConsole.IsVisible = true;
+            inventory.IsVisible = false;
         }
 
         private void MovePlayer(Direction direction) {
@@ -106,7 +119,13 @@ namespace Rogue.Components {
                 var action = mapConsole.GetAction(player, actors, direction);
                 if (action != null) {
                     var result = action.Perform(player);
-                    messageConsole.SetMessage(result.Message);
+                    if (result.Outcome == Actions.Outcome.Success) {
+                        logConsole.Log(result.Message);
+                        messageConsole.SetMessage("");
+                    }
+                    else {
+                        messageConsole.SetMessage(result.Message);
+                    }
                 }
                 else {
                     messageConsole.SetMessage("Nothing to do");

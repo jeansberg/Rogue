@@ -9,9 +9,10 @@ namespace Rogue.Actions {
         }
 
         public ActionResult Perform(Actor actor, bool defaultAction = false) {
-            target.Health--;
+            var damage = actor.Weapon == null ? 1 : 2;
+            target.Health -= damage;
 
-            return ActionResult.Succeed($"{actor.Name} attacked {target.Name}", false);
+            return ActionResult.Succeed($"{actor.Name} attacked {target.Name} for {damage} damage", false);
         }
     }
 }

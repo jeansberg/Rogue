@@ -11,6 +11,7 @@ namespace Rogue.GameObjects {
         public bool IsAlive => Health > 0;
         public FieldOfView<MapCell> Fov { get; set; }
         public List<GameObject> Inventory { get; set; }
+        public GameObject Weapon { get; set; }
 
         public Actor(SadRogue.Primitives.Point location, Color color, int glyphId, int health, string name, FieldOfView<MapCell> fov) :
             base(location, color, glyphId, name) {

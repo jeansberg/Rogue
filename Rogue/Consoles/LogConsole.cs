@@ -15,6 +15,7 @@ namespace Rogue.Consoles {
 
             Cursor.Position = new SadRogue.Primitives.Point(0, 0);
             Cursor.Print("Log");
+            Cursor.NewLine();
 
             foreach (var message in messages) {
                 Cursor.NewLine();

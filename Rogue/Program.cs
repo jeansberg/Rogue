@@ -20,6 +20,8 @@ namespace Rogue {
             map = generator.GenerateMap();
             
             var player = new Player(new Point(0, 0), Color.Yellow, new RogueSharp.FieldOfView<MapCell>(map));
+            player.Inventory.Add(new Sword(new Point()));
+            player.Inventory.Add(new Spear(new Point()));
 
             actors = new List<Actor> {
                 player,

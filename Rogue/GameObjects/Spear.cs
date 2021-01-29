@@ -3,8 +3,8 @@ using Rogue.MazeGenerator;
 using SadRogue.Primitives;
 
 namespace Rogue.GameObjects {
-    public class Spear : GameObject{
-        public Spear(Point location) : base(location, Color.Yellow, 179, "Spear") {
+    public class Sword : GameObject{
+        public Sword(Point location) : base(location, Color.Blue, 47, "Sword") {
         }
 
         public override IAction GetAction(RogueMap<MapCell> map, Direction.Types from) {

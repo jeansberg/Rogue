@@ -143,9 +143,5 @@ namespace Rogue.Consoles {
 
             return Visibility.Hidden;
         }
-
-        private void SkipCell() {
-            Cursor.RightWrap(1);
-        }
     }
 }
