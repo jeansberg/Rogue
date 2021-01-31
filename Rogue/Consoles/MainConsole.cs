@@ -41,6 +41,8 @@ namespace Rogue.Consoles {
             messageConsole.Update(delta);
             logConsole.Update(delta);
             inventory.Update(delta);
+
+            _keyboardHandlerObject.Update(this, delta);
         }
 
         public override bool ProcessMouse(MouseScreenObjectState state) {

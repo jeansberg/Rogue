@@ -17,6 +17,8 @@ namespace Rogue.Components {
         private Actor player;
         private readonly InventoryConsole inventory;
         private List<Actor> actors;
+        private List<Action> actions;
+        private Timer turnTimer;
 
         public KeyboardHandler(MapConsole mapConsole, LogConsole logConsole, MessageConsole messageConsole, Actor player, InventoryConsole inventory, List<Actor> actors) {
             this.mapConsole = mapConsole;
@@ -28,9 +30,15 @@ namespace Rogue.Components {
 
             state = InputState.Idle;
             mapConsole.IsFocused = true;
+            actions = new List<Action>();
         }
 
         public override void ProcessKeyboard(IScreenObject consoleObject, Keyboard info, out bool handled) {
+            if (actions.Any()) {
+                handled = true;
+                return;
+            }
+
             var playerMoved = false;
             if (state == InputState.Idle) {
                 if (info.IsKeyPressed(Keys.Down)) {
@@ -102,6 +110,25 @@ namespace Rogue.Components {
             handled = true;
         }
 
+        public void Update(SadConsole.Console console, TimeSpan delta) {
+            if (!actions.Any()) {
+                return;
+            }
+
+            if (turnTimer == null || turnTimer.IsPaused) {
+                turnTimer = new SadConsole.Components.Timer(TimeSpan.FromSeconds(0.2));
+
+                turnTimer.TimerElapsed += (timer, e) =>
+                {
+                    var action = actions.First();
+                    actions.Remove(action);
+                    action();
+                };
+            }
+
+            turnTimer.Update(console, delta);
+        }
+
         private void ExitInventory() {
             state = InputState.Idle;
             mapConsole.IsVisible = true;
@@ -141,11 +168,7 @@ namespace Rogue.Components {
             foreach (var actor in actors.Where(a => a != player && a.IsAlive)) {
                 actor.Fov.ComputeFov(actor.Location.X, actor.Location.Y, 5, true);
                 if (player.IsAlive && actor.Fov.IsInFov(player.Location.X, player.Location.Y)) {
-                    //var progressTimer = new SadConsole.Components.Timer(TimeSpan.FromSeconds(0.5));
-                    //progressTimer.TimerElapsed += (timer, e) =>
-                    //{
-                        MoveTo(actor, player.Location);
-                    //};
+                    actions.Add(() => { MoveTo(actor, player.Location); });
                 }
             }
         }
