@@ -41,8 +41,10 @@ namespace Rogue.Consoles {
                 .ToDictionary(k => k.key, v => v.item);
 
             foreach (var item in itemsWithKeys) {
+                Cursor.Print(new ColoredString($"{item.Value.Name} - " + item.Key, new ColoredString.ColoredGlyphEffect {
+                    Decorators = new CellDecorator[] {new CellDecorator(SadRogue.Primitives.Color.Red, 178, Mirror.None) }
+                }));
                 Cursor.NewLine();
-                Cursor.Print($"{item.Value.Name} - " + item.Key);
             }
 
             base.Update(delta);

@@ -6,6 +6,7 @@ using RogueSharp;
 using RogueSharp.Algorithms;
 using SadConsole;
 using SadConsole.Host;
+using SadConsole.Input;
 using SadRogue.Primitives;
 using System;
 using System.Collections.Generic;
@@ -88,14 +89,15 @@ namespace Rogue.Consoles {
         public IAction GetAction(Actor actor, List<Actor> actors, Direction.Types direction) {
             var location = actor.Location.Increment(direction);
 
-            var gameObject = map.GameObjects.FirstOrDefault(g => g.Location == location);
-            if (gameObject != null) {
-                return gameObject.GetAction(map, direction.Opposite());
-            }
-
+            // Check actors first since they should always block
             var otherActor = actors.FirstOrDefault(g => g.Location == location && g != actor);
             if (otherActor != null && otherActor.IsAlive) {
                 return otherActor.GetAction(map, direction.Opposite());
+            }
+
+            var gameObject = map.GameObjects.FirstOrDefault(g => g.Location == location);
+            if (gameObject != null) {
+                return gameObject.GetAction(map, direction.Opposite());
             }
 
             return null;
@@ -142,6 +144,10 @@ namespace Rogue.Consoles {
             }
 
             return Visibility.Hidden;
+        }
+
+        public override bool ProcessMouse(MouseScreenObjectState state) {
+            return false;
         }
     }
 }

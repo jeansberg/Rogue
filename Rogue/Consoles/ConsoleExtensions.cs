@@ -10,9 +10,11 @@ namespace Rogue.Consoles {
         public static void Draw(this Console console, MapCell cell, Visibility visibility) {
             if (visibility == Visibility.Hidden) {
                 console.Cursor.RightWrap(1);
+                return;
             }
 
             var foreground = visibility == Visibility.InFov ? cell.Color : cell.Color.GetDarker();
+            console.Cursor.Position = new Point(cell.X, cell.Y);
             Draw(console, foreground, cell.GlyphId);
         }
 

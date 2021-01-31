@@ -4,11 +4,12 @@ using SadConsole;
 using SadConsole.Components;
 using SadConsole.Input;
 using SadRogue.Primitives;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Rogue.Components {
-    public class KeyboardHandler : KeyboardConsoleComponent {
+    public class KeyboardHandler : InputConsoleComponent {
         private readonly MessageConsole messageConsole;
         private InputState state;
         private MapConsole mapConsole;
@@ -26,6 +27,7 @@ namespace Rogue.Components {
             this.actors = actors;
 
             state = InputState.Idle;
+            mapConsole.IsFocused = true;
         }
 
         public override void ProcessKeyboard(IScreenObject consoleObject, Keyboard info, out bool handled) {
@@ -139,7 +141,11 @@ namespace Rogue.Components {
             foreach (var actor in actors.Where(a => a != player && a.IsAlive)) {
                 actor.Fov.ComputeFov(actor.Location.X, actor.Location.Y, 5, true);
                 if (player.IsAlive && actor.Fov.IsInFov(player.Location.X, player.Location.Y)) {
-                    MoveTo(actor, player.Location);
+                    //var progressTimer = new SadConsole.Components.Timer(TimeSpan.FromSeconds(0.5));
+                    //progressTimer.TimerElapsed += (timer, e) =>
+                    //{
+                        MoveTo(actor, player.Location);
+                    //};
                 }
             }
         }
@@ -174,6 +180,18 @@ namespace Rogue.Components {
             else {
                 mapConsole.MoveActor(actor, actors, direction);
             }
+        }
+
+        public override void ProcessMouse(IScreenObject host, MouseScreenObjectState state, out bool handled) {
+            var cellPosition = state.CellPosition + new Point(-1, -1);
+
+            var actor = actors
+                .SingleOrDefault(a => a.Location == cellPosition && player.Fov.IsInFov(a.Location.X, a.Location.Y));
+            if (actor != null) {
+                messageConsole.SetMessage(actor.Name);
+            }
+
+            handled = true;
         }
     }
 }

@@ -41,7 +41,7 @@ namespace Rogue {
 
         private static void Init() {
             // Any startup code for your game. We will use an example console for now
-            var mapConsole = new MapConsole(map, true);
+            var mapConsole = new MapConsole(map, false);
             var logConsole = new LogConsole();
             var messageConsole = new MessageConsole();
             var inventory = new InventoryConsole(actors.Single(a => a is Player));

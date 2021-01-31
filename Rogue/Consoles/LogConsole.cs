@@ -17,9 +17,13 @@ namespace Rogue.Consoles {
             Cursor.Print("Log");
             Cursor.NewLine();
 
+            
+
             foreach (var message in messages) {
-                Cursor.NewLine();
                 Cursor.Print(message);
+                if (Cursor.Column != 0) {
+                    Cursor.NewLine();
+                }
             }
 
             base.Update(delta);

@@ -1,6 +1,8 @@
 ﻿using Rogue.Components;
 using Rogue.GameObjects;
 using SadConsole;
+using SadConsole.Host;
+using SadConsole.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +26,8 @@ namespace Rogue.Consoles {
             this.actors = actors;
             player = actors.Single(a => a is Player);
 
+            this.Font = new Font(12, 12, 0, 16, 16, 0, new GameTexture(new SFML.Graphics.Texture("../../../Cheepicus_12x12.png")), "mapFont");
+
             _keyboardHandlerObject = new KeyboardHandler(mapConsole, logConsole, messageConsole, player, inventory, actors);
             GameHost.Instance.FocusedScreenObjects.Set(this);
 
@@ -37,6 +41,11 @@ namespace Rogue.Consoles {
             messageConsole.Update(delta);
             logConsole.Update(delta);
             inventory.Update(delta);
+        }
+
+        public override bool ProcessMouse(MouseScreenObjectState state) {
+            _keyboardHandlerObject.ProcessMouse(this, state, out bool handled);
+            return handled;
         }
     }
 }
