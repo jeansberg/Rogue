@@ -4,7 +4,7 @@ using SadRogue.Primitives;
 
 namespace Rogue.GameObjects {
     public class Sword : GameObject{
-        public Sword(Point location) : base(location, Color.Blue, 47, "Sword") {
+        public Sword(Point location) : base(location, Color.Blue, 47, "Sword", GameObjectType.Weapon) {
         }
 
         public override IAction GetAction(RogueMap<MapCell> map, Direction.Types from) {

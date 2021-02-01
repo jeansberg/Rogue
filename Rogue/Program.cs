@@ -1,6 +1,7 @@
 ﻿using Rogue.Consoles;
 using Rogue.GameObjects;
 using Rogue.MazeGenerator;
+using Rogue.Services;
 using SadRogue.Primitives;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,8 @@ namespace Rogue {
 
         static void Main(string[] args)
         {
+            Locator.RegisterAudioPlayer(new AudioPlayer());
+
             var generator = new MapGenerator(new Map.RoomDecorator(), Width, Height, 100, 3, 9, 3, 9);
 
             map = generator.GenerateMap();

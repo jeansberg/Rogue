@@ -1,5 +1,6 @@
 ﻿using Rogue.GameObjects;
 using Rogue.MazeGenerator;
+using Rogue.Services;
 using SadConsole;
 using SadRogue.Primitives;
 
@@ -37,6 +38,7 @@ namespace Rogue.Actions {
             door.IsOpen = true;
             map[door.OriginalLocation.X, door.OriginalLocation.Y].IsTransparent = true;
 
+            Locator.Audio.PlaySound("doorOpen");
             return ActionResult.Succeed("Opened door", true);
         }
 

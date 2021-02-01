@@ -1,5 +1,6 @@
 ﻿using Rogue.GameObjects;
 using Rogue.MazeGenerator;
+using Rogue.Services;
 
 namespace Rogue.Actions {
     public class CloseDoor : IAction {
@@ -33,6 +34,7 @@ namespace Rogue.Actions {
             door.IsOpen = false;
             map[door.OriginalLocation.X, door.OriginalLocation.Y].IsTransparent = false;
 
+            Locator.Audio.PlaySound("doorClose");
             return ActionResult.Succeed("Closed door", false);
         }
     }

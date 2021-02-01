@@ -2,6 +2,7 @@
 using Rogue.Map;
 using Rogue.MazeGenerator;
 using Rogue.Primitives;
+using Rogue.Services;
 using RogueSharp;
 using RogueSharp.Algorithms;
 using SadConsole;
@@ -50,6 +51,13 @@ namespace Rogue.Consoles {
             var newPoint = actor.Location.Increment(dir);
             if (!map.InBounds(newPoint) || !map[newPoint.X, newPoint.Y].IsWalkable) {
                 return false;
+            }
+
+            if (actor is Player) {
+                // Do nothing
+            }
+            else {
+                Locator.Audio.PlaySound("footStep");
             }
 
             actor.Location = newPoint;
