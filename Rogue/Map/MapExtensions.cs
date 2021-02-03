@@ -8,6 +8,6 @@ namespace Rogue {
             p.X >= 0 && p.X < map.Width &&
             p.Y >= 0 && p.Y < map.Height;
 
-        public static bool Occupied(this RogueMap<MapCell> map, Point p) => map.Actors.Any(g => g.Location == p && g.IsAlive);
+        public static bool Occupied(this RogueMap<MapCell> map, Point p) => map.Actors.Any(a => a.Location == p && a.IsAlive);
     }
 }

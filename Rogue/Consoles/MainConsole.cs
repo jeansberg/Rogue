@@ -16,7 +16,7 @@ namespace Rogue.Consoles {
         private readonly InventoryConsole inventory;
         private readonly List<Actor> actors;
         private readonly Actor player;
-        private readonly KeyboardHandler _keyboardHandlerObject;
+        private readonly KeyboardHandler keyboardHandlerObject;
 
         public MainConsole(MapConsole mapConsole, LogConsole logConsole, MessageConsole messageConsole, InventoryConsole inventory, List<Actor> actors) : base(80, 40) {
             this.mapConsole = mapConsole;
@@ -28,10 +28,10 @@ namespace Rogue.Consoles {
 
             this.Font = new Font(12, 12, 0, 16, 16, 0, new GameTexture(new SFML.Graphics.Texture("../../../Cheepicus_12x12.png")), "mapFont");
 
-            _keyboardHandlerObject = new KeyboardHandler(mapConsole, logConsole, messageConsole, player, inventory, actors);
+            keyboardHandlerObject = new KeyboardHandler(mapConsole, logConsole, messageConsole, player, inventory, actors);
             GameHost.Instance.FocusedScreenObjects.Set(this);
 
-            SadComponents.Add(_keyboardHandlerObject);
+            SadComponents.Add(keyboardHandlerObject);
 
             inventory.IsVisible = false;
         }
@@ -42,11 +42,11 @@ namespace Rogue.Consoles {
             logConsole.Update(delta);
             inventory.Update(delta);
 
-            _keyboardHandlerObject.Update(this, delta);
+            keyboardHandlerObject.Update(this, delta);
         }
 
         public override bool ProcessMouse(MouseScreenObjectState state) {
-            _keyboardHandlerObject.ProcessMouse(this, state, out bool handled);
+            keyboardHandlerObject.ProcessMouse(this, state, out bool handled);
             return handled;
         }
     }

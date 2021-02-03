@@ -17,13 +17,15 @@ using Point = SadRogue.Primitives.Point;
 
 namespace Rogue.Consoles {
     public class MapConsole : SadConsole.Console {
-        private readonly RogueMap<MapCell> map;
+        public readonly RogueMap<MapCell> map;
+        public List<Point> overlayPoints;
         private readonly bool showEverything;
 
         public MapConsole(RogueMap<MapCell> map, bool showEverything) : base(map.Width, map.Height + 1) {
             this.Font = new Font(12, 12, 0, 16, 16, 0, new GameTexture(new SFML.Graphics.Texture("../../../Cheepicus_12x12.png")), "mapFont");
 
             this.map = map;
+            this.overlayPoints = new List<Point>();
             this.showEverything = showEverything;
             this.Position = new SadRogue.Primitives.Point(1, 1);
         }
@@ -43,6 +45,7 @@ namespace Rogue.Consoles {
             DrawMap(player.Fov);
             DrawGameObjects(map.GameObjects ,player.Fov);
             DrawGameObjects(actors.Where(a => a.IsAlive), player.Fov);
+            DrawOverlay();
 
             base.Update(delta);
         }
@@ -140,6 +143,12 @@ namespace Rogue.Consoles {
             foreach (var cell in map.GetAllCells()) {
                 var visibility = GetVisibility(cell, fov);
                 this.Draw(cell, visibility);
+            }
+        }
+
+        private void DrawOverlay() {
+            foreach (var point in overlayPoints) {
+                this.Draw(point, new ColoredGlyph(Color.Green, Color.Transparent, 7));
             }
         }
 

@@ -28,6 +28,11 @@ namespace Rogue.Consoles {
             Draw(console, foreground, gameObject.GlyphId);
         }
 
+        public static void Draw(this Console console, Point point, ColoredGlyph glyph) {
+            console.Cursor.Position = point;
+            Draw(console, glyph.Foreground, glyph.Glyph);
+        }
+
         private static void Draw(Console console, Color foreground, int glyphId) {
             var coloredString = new ColoredString(new ColoredGlyph(foreground, Color.Black, glyphId));
             console.Cursor.Print(coloredString);

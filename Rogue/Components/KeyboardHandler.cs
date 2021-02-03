@@ -20,6 +20,7 @@ namespace Rogue.Components {
         private List<Actor> actors;
         private List<Action> actions;
         private Timer turnTimer;
+        private List<Point> trajectory;
 
         public KeyboardHandler(MapConsole mapConsole, LogConsole logConsole, MessageConsole messageConsole, Actor player, InventoryConsole inventory, List<Actor> actors) {
             this.mapConsole = mapConsole;
@@ -45,23 +46,26 @@ namespace Rogue.Components {
                 if (info.IsKeyPressed(Keys.Down)) {
                     MovePlayer(Direction.Down);
                     playerMoved = true;
-                } else
-                if (info.IsKeyPressed(Keys.Up)) {
+                }
+                else if (info.IsKeyPressed(Keys.Up)) {
                     MovePlayer(Direction.Up);
                     playerMoved = true;
-                } else
-                if (info.IsKeyPressed(Keys.Left)) {
+                }
+                else if (info.IsKeyPressed(Keys.Left)) {
                     MovePlayer(Direction.Left);
                     playerMoved = true;
-                } else
-                if (info.IsKeyPressed(Keys.Right)) {
+                }
+                else if (info.IsKeyPressed(Keys.Right)) {
                     MovePlayer(Direction.Right);
                     playerMoved = true;
-                } else
-                if (info.IsKeyPressed(Keys.Space)) {
+                }
+                else if (info.IsKeyPressed(Keys.Space)) {
+                    state = InputState.TargetingDirection;
+                }
+                else if (info.IsKeyPressed(Keys.T)) {
                     state = InputState.Targeting;
-                } else
-                if (info.IsKeyPressed(Keys.I)) {
+                }
+                else if (info.IsKeyPressed(Keys.I)) {
                     state = InputState.Inventory;
                     inventory.IsVisible = true;
                     mapConsole.IsVisible = false;
@@ -69,24 +73,36 @@ namespace Rogue.Components {
                     logConsole.IsVisible = false;
                 }
             }
-            else if (state == InputState.Targeting) {
-                messageConsole.SetMessage("Select a target");
+            else if (state == InputState.TargetingDirection) {
+                messageConsole.SetMessage("Which direction?");
 
                 if (info.IsKeyPressed(Keys.Down)) {
-                    Target(Direction.Down);
+                    TargetDirection(Direction.Down);
                     playerMoved = true;
-                } else
+                }
+                else
                 if (info.IsKeyPressed(Keys.Up)) {
-                    Target(Direction.Up);
+                    TargetDirection(Direction.Up);
                     playerMoved = true;
-                } else
+                }
+                else
                 if (info.IsKeyPressed(Keys.Left)) {
-                    Target(Direction.Left);
+                    TargetDirection(Direction.Left);
                     playerMoved = true;
-                } else
+                }
+                else
                 if (info.IsKeyPressed(Keys.Right)) {
-                    Target(Direction.Right);
+                    TargetDirection(Direction.Right);
                     playerMoved = true;
+                }
+            }
+            else if (state == InputState.Targeting) {
+                messageConsole.SetMessage("Select a target");
+                mapConsole.overlayPoints = new List<Point>();
+
+                if (info.IsKeyPressed(Keys.T)) {
+                    messageConsole.SetMessage("");
+                    state = InputState.Idle;
                 }
             }
             else if (state == InputState.Inventory) {
@@ -144,7 +160,7 @@ namespace Rogue.Components {
             MoveOrAct(player, direction);
         }
 
-        private void Target(Direction.Types direction) {
+        private void TargetDirection(Direction.Types direction) {
             if (direction != Direction.Types.None) {
                 var action = mapConsole.GetAction(player, actors, direction);
                 if (action != null) {
@@ -163,6 +179,21 @@ namespace Rogue.Components {
 
                 state = InputState.Idle;
             }
+        }
+
+        private void FireMissile(List<Point> trajectory) {
+            Locator.Audio.PlaySound("missile");
+            var missile = new Missile(trajectory.First());
+            mapConsole.map.GameObjects.Add(missile);
+            foreach(var point in trajectory) {
+                actions.Add(() => { MoveMissile(missile, point); });
+            }
+        }
+
+        private void MoveMissile(Missile missile, Point point) {
+            missile.Location = point;
+
+            actors.FirstOrDefault(a => a.Location == point)?.GetAction(mapConsole.map, Direction.Types.None).Perform(player);
         }
 
         private void UpdateActors() {
@@ -206,11 +237,41 @@ namespace Rogue.Components {
             }
         }
 
-        public override void ProcessMouse(IScreenObject host, MouseScreenObjectState state, out bool handled) {
-            var cellPosition = state.CellPosition + new Point(-1, -1);
+        public override void ProcessMouse(IScreenObject host, MouseScreenObjectState mouse, out bool handled) {
+            var mousePos = mouse.CellPosition + new Point(-1, -1);
+
+            if (state == InputState.Targeting) {
+                trajectory = new List<Point>();
+                Point playerPos = player.Location;
+
+                Algorithms.Line(playerPos.X, playerPos.Y, mousePos.X, mousePos.Y, (int x, int y) => {
+                    Point point = new Point(x, y);
+                    if (!mapConsole.map.InBounds(point) || !mapConsole.map.IsWalkable(x, y)) {
+                        trajectory.Clear();
+                        return false;
+                    }
+
+                    if (playerPos != point) {
+                        trajectory.Add(point);
+                    }
+                    return true;
+                });
+
+                mapConsole.overlayPoints = trajectory;
+
+                if (mouse.Mouse.LeftClicked && trajectory.Any()) {
+                    if (playerPos.X > mousePos.X || playerPos.Y > mousePos.Y) {
+                        trajectory.Reverse();
+                    }
+
+                    FireMissile(trajectory);
+                    state = InputState.Idle;
+                    mapConsole.overlayPoints.Clear();
+                }
+            }
 
             var actor = actors
-                .SingleOrDefault(a => a.Location == cellPosition && player.Fov.IsInFov(a.Location.X, a.Location.Y));
+                .SingleOrDefault(a => a.Location == mousePos && player.Fov.IsInFov(a.Location.X, a.Location.Y));
             if (actor != null) {
                 messageConsole.SetMessage(actor.Name);
             }
