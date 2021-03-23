@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <PackageReference Include="NAudio" Version="2.0.0" />
-    <PackageReference Include="RogueSharp" Version="5.0.0-pre4" />
     <PackageReference Include="SadConsole" Version="9.0.0-beta4" />
     <PackageReference Include="SadConsole.Host.SFML" Version="9.0.0-beta4" />
   </ItemGroup>
