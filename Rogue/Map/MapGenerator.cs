@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using Core;
+using Core.Interfaces;
 using Rogue.GameObjects;
 using Rogue.Map;
 using Rogue.MazeGenerator;
-using RogueSharp;
-using SadConsole;
-using SadRogue.Primitives;
-using Rectangle = SadRogue.Primitives.Rectangle;
-using Point = SadRogue.Primitives.Point;
+using Utilities.RogueSharp;
+using Point = Core.Point;
 
 namespace Rogue {
     public class MapGenerator
@@ -38,18 +38,15 @@ namespace Rogue {
             this.roomDecorator = roomDecorator;
         }
 
-        public RogueMap<MapCell> GenerateMap()
+        public IMap GenerateMap()
         {
-            var map = new RogueMap<MapCell>(Width, Height);
-            foreach(var cell in map.GetAllCells()) {
-                cell.Type = CellType.Wall;
-            }
+            var map = new RogueMap(Width, Height);
 
             PlaceRooms(map);
 
             var maze = new MazeCarver(map);
 
-            maze.CarveMaze(new SadRogue.Primitives.Point(0, 0), Direction.Up);
+            maze.CarveMaze(new Point(0, 0), Direction.Up);
 
             ConnectRooms(map);
             DecorateRooms(map);
@@ -58,32 +55,32 @@ namespace Rogue {
             return map;
         }
 
-        private void PlaceMonsters(RogueMap<MapCell> map) {
-            map.Actors = new List<Actor>();
+        private void PlaceMonsters(IMap map) {
             foreach(var room in Rooms) {
                 SpawnMonster(room, map);
             }
         }
 
-        private void SpawnMonster(Room room, RogueMap<MapCell> map) {
+        private void SpawnMonster(Room room, IMap map) {
             Point location;
             do {
-                var x = Rnd.Next(room.Bounds.X, room.Bounds.MaxExtentX);
-                var y = Rnd.Next(room.Bounds.Y, room.Bounds.MaxExtentY);
+                var x = Rnd.Next(room.Bounds.X, room.Bounds.Right);
+                var y = Rnd.Next(room.Bounds.Y, room.Bounds.Bottom);
                 location = new Point(x, y);
             }
-            while (map.GameObjects.Any(global => global.Location == location));
+            while (map.GameObjects.Any(g => g.Location == location));
 
-            map.Actors.Add(new Monster(location, Color.Green, 2, 2, "Monster", new RogueSharp.FieldOfView<MapCell>(map)));
+            map.Actors
+                .Add(new Monster(location, Color.Green, 2, 2, "Monster", new RogueSharpFov(map)));
         }
 
-        private void DecorateRooms(RogueMap<MapCell> map) {
-            roomDecorator.GetDecorations(Rooms, map.GameObjects, Rnd);
+        private void DecorateRooms(IMap map) {
+            roomDecorator.GetDecorations(Rooms, map.GameObjects.ToList(), Rnd);
         }
 
-        private void ConnectRooms(RogueMap<MapCell> map) {
-            var connectorCandidates = new List<MapCell>();
-            foreach (var cell in map.GetAllCells().Where(IsWall())) {
+        private void ConnectRooms(IMap map) {
+            var connectorCandidates = new List<ICell>();
+            foreach (var cell in map.Cells().Where(IsWall())) {
                 if (IsConnectorCandidate(cell, map)) {
                     connectorCandidates.Add(cell);
                 }
@@ -92,8 +89,8 @@ namespace Rogue {
             var roomsToDelete = new List<Room>();
             foreach (var room in Rooms) {
                 var bounds = room.Bounds;
-                var connectors = bounds.Positions()
-                    .SelectMany(p => map.GetAdjacentCells(p.X, p.Y))
+                var connectors = bounds.Points()
+                    .SelectMany(p => map.GetAdjacent(p.ToPoint()))
                     .Where(c => connectorCandidates.Contains(c))
                     .ToList();
 
@@ -104,7 +101,7 @@ namespace Rogue {
                     if (connectors.Count > 1 && Rnd.Next(0, 2) == 1) {
                         connectors.Remove(connector);
                         var secondConnector = connectors[Rnd.Next(0, connectors.Count)];
-                        if (map.GetAdjacentCells(secondConnector.X, secondConnector.Y).Any(HasDoor(map))) {
+                        if (map.GetAdjacent(secondConnector.Location).Any(HasDoor(map))) {
                             continue;
                         }
                         CreateDoor(map, bounds, secondConnector);
@@ -115,14 +112,17 @@ namespace Rogue {
                     // Todo: Fix the maze generation issue that causes this
                     roomsToDelete.Add(room);
 
-                    bounds.Expand(2, 2).Positions()
+                    Rectangle.Inflate(bounds, 2, 2).Points()
+                        .Select(x => x.ToPoint())
                         .ToList()
                         .ForEach(p => {
                             if (map.InBounds(p)) {
-                                var mapCell = map[p.X, p.Y];
+                                var mapCell = map.GetCellAt(p);
                                 mapCell.Type = CellType.Wall;
-                                map.SetCellProperties(p.X, p.Y, false, false);
-                                map.GameObjects.RemoveAll(g => g.Location == new Point(mapCell.X, mapCell.Y));
+                                map.SetTransparent(p, false);
+                                map.SetWalkable(p, false);
+
+                                map.GameObjects.RemoveAll(g => g.Location == new Point(mapCell.Location.X, mapCell.Location.Y));
                         }
                     });
                 }
@@ -130,27 +130,28 @@ namespace Rogue {
             Rooms.RemoveAll(r => roomsToDelete.Contains(r));
         }
 
-        private static Func<MapCell, bool> HasDoor(RogueMap<MapCell> map) {
-            return c => map.GameObjects.Any(g => g is Door && g.Location.X == c.X && g.Location.Y == c.Y);
+        private static Func<ICell, bool> HasDoor(IMap map) {
+            return c => map.GameObjects.Any(g => g is Door && g.Location.X == c.Location.X && g.Location.Y == c.Location.Y);
         }
 
-        private static Func<MapCell, bool> IsWall() {
+        private static Func<ICell, bool> IsWall() {
             return c => c.Type == CellType.Wall || c.Type == CellType.RoomWallHorizontal || c.Type == CellType.RoomWallVertical;
         }
 
-        private void CreateDoor(RogueMap<MapCell> map, Rectangle room, MapCell connector) {
+        private void CreateDoor(IMap map, Rectangle room, ICell connector) {
             connector.Type = CellType.Maze;
             var door = new Door(
-                new SadRogue.Primitives.Point(connector.X, connector.Y), 
-                (connector.X == room.X - 1 || connector.X == room.MaxExtentX + 1) ? Orientation.Vertical : Orientation.Horizontal);
+                connector.Location, 
+                (connector.Location.X == room.X - 1 || connector.Location.X == room.Right + 1) ? Orientation.Vertical : Orientation.Horizontal);
 
             map.GameObjects.Add(door);
 
-            map.SetCellProperties(connector.X, connector.Y, false, true);
+            map.SetWalkable(connector.Location, true);
+            map.SetTransparent(connector.Location, false);
         }
 
-        private bool IsConnectorCandidate(MapCell cell, Map<MapCell> map) {
-            var adjacent = map.GetAdjacentCells(cell.X, cell.Y);
+        private bool IsConnectorCandidate(ICell cell, IMap map) {
+            var adjacent = map.GetAdjacent(cell.Location);
             if (adjacent.Any(adjacent => adjacent.Type == CellType.RoomFloor) 
                 && adjacent.Any(a => a.Type == CellType.Maze)) {
                 return true;
@@ -163,7 +164,7 @@ namespace Rogue {
             return false;
         }
 
-        private void PlaceRooms(RogueMap<MapCell> map)
+        private void PlaceRooms(IMap map)
         {
             Rooms = new List<Room>();
 
@@ -198,7 +199,7 @@ namespace Rogue {
             foreach(var room in Rooms)
             {
                 var bounds = room.Bounds;
-                if (newRoom.Expand(4, 4).Intersects(bounds))
+                if (Rectangle.Inflate(newRoom, 4, 4).IntersectsWith(bounds))
                 {
                     return true;
                 }
@@ -206,28 +207,29 @@ namespace Rogue {
             return false;
         }
 
-        private void PlaceRoom(RogueMap<MapCell> map, Rectangle room)
+        private void PlaceRoom(IMap map, Rectangle room)
         {
             for (int x = room.X - 1; x < room.X + room.Width + 1; x++)
             {
                 for (int y = room.Y - 1; y < room.Y + room.Height + 1; y++)
                 {
-                    if (!map.InBounds(new SadRogue.Primitives.Point(x, y))) {
+                    var point = new Point(x, y);
+                    if (!map.InBounds(point)) {
                         continue;
                     }
 
                     if (y == room.Y - 1) {
-                        map[x, y].Type = CellType.RoomWallHorizontal;
+                        map.GetCellAt(point).Type = CellType.RoomWallHorizontal;
                     }
                     else if (y == room.Y + room.Height) {
-                        map[x, y].Type = CellType.RoomWallHorizontal;
+                        map.GetCellAt(point).Type = CellType.RoomWallHorizontal;
                     }
                     else if (x == room.X - 1 || x == room.X + room.Width) {
-                        map[x, y].Type = CellType.RoomWallVertical;
+                        map.GetCellAt(point).Type = CellType.RoomWallVertical;
                     }
                     else {
-                        map.SetCellProperties(x, y, true, true);
-                        map[x, y].Type = CellType.RoomFloor;
+                        map.SetWalkable(point, true);
+                        map.SetTransparent(point, true); map.GetCellAt(new Point(x, y)).Type = CellType.RoomFloor;
                     }
                 }
             }

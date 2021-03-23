@@ -18,7 +18,7 @@ namespace Rogue.Actions {
                 return ActionResult.Cancel("", true);
             }
 
-            if (actor.Location == door.OriginalLocation) {
+            if (actor.Location.Equals(door.OriginalLocation)) {
                 return ActionResult.Fail("That might hurt", false);
             }
 
@@ -33,7 +33,7 @@ namespace Rogue.Actions {
             door.Location = door.OriginalLocation;
 
             door.IsOpen = false;
-            map.SetTransparent(door.Location, false);
+            map.SetTransparent(door.OriginalLocation, false);
 
             Locator.Audio.PlaySound("doorClose");
             return ActionResult.Succeed("Closed door", false);

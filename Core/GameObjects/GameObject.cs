@@ -1,4 +1,6 @@
-﻿using SadRogue.Primitives;
+﻿using Core;
+using Core.Interfaces;
+using Color = System.Drawing.Color;
 
 namespace Rogue.GameObjects {
     public abstract class GameObject : IHasAction {
@@ -14,7 +16,6 @@ namespace Rogue.GameObjects {
         public Point Location { get; set; }
         public string Name { get; set; }
         public GameObjectType Type { get; set; }
-
-        public abstract IAction GetAction(RogueMap<MazeGenerator.MapCell> map, Direction.Types from);
+        public abstract IAction GetAction(IMap map, Direction from);
     }
 }

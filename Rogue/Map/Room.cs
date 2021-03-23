@@ -1,4 +1,4 @@
-﻿using SadRogue.Primitives;
+﻿using System.Drawing;
 
 namespace Rogue.Map {
     public class Room {

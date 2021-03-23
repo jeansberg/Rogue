@@ -1,7 +1,7 @@
-﻿using Rogue.Actions;
-using Rogue.MazeGenerator;
-using SadRogue.Primitives;
-using System.Windows.Forms;
+﻿using Core;
+using Core.Interfaces;
+using Rogue.Actions;
+using Color = System.Drawing.Color;
 
 namespace Rogue.GameObjects {
     public class Missile : GameObject {
@@ -10,7 +10,7 @@ namespace Rogue.GameObjects {
 
         public Orientation Orientation { get; set; }
 
-        public override IAction GetAction(RogueMap<MapCell> map, Direction.Types from) {
+        public override IAction GetAction(IMap map, Direction from) {
             return new NullAction();
         }
     }

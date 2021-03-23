@@ -1,17 +1,19 @@
-﻿using Rogue.Consoles;
+﻿using Core.Interfaces;
+using Rogue.Consoles;
 using Rogue.GameObjects;
-using Rogue.MazeGenerator;
 using Rogue.Services;
-using SadRogue.Primitives;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using Utilities.RogueSharp;
+using Point = Core.Point;
 
 namespace Rogue {
     class Program
     {
         private const int Width = 60;
         private const int Height = 40;
-        private static RogueMap<MapCell> map;
+        private static IMap map;
         private static List<Actor> actors;
 
         static void Main(string[] args)
@@ -22,7 +24,7 @@ namespace Rogue {
 
             map = generator.GenerateMap();
             
-            var player = new Player(new Point(0, 0), Color.Yellow, new RogueSharp.FieldOfView<MapCell>(map));
+            var player = new Player(new Point(0, 0), Color.Yellow, new RogueSharpFov(map));
             player.Inventory.Add(new Sword(new Point()));
             player.Inventory.Add(new Spear(new Point()));
 
@@ -44,7 +46,7 @@ namespace Rogue {
 
         private static void Init() {
             // Any startup code for your game. We will use an example console for now
-            var mapConsole = new MapConsole(map, false);
+            var mapConsole = new MapConsole(map, false, new AStarPathFinder());
             var logConsole = new LogConsole();
             var messageConsole = new MessageConsole();
             var inventory = new InventoryConsole(actors.Single(a => a is Player));

@@ -1,10 +1,10 @@
-﻿using Rogue.Actions;
-using SadConsole;
-using SadRogue.Primitives;
+﻿using Core;
+using Core.Interfaces;
+using Rogue.Actions;
 
 namespace Rogue.GameObjects {
     public class Door : GameObject {
-        public Door(Point location, Orientation orientation) : base(location, Color.SaddleBrown, orientation == Orientation.Vertical ? 179 : 196, "door") {
+        public Door(Point location, Orientation orientation) : base(location, System.Drawing.Color.SaddleBrown, orientation == Orientation.Vertical ? 179 : 196, "door") {
             Orientation = orientation;
             IsOpen = false;
             OriginalOrientation = orientation;
@@ -18,7 +18,7 @@ namespace Rogue.GameObjects {
 
         public bool IsOpen { get; set; }
 
-        public override IAction GetAction(RogueMap<MazeGenerator.MapCell> map, Direction.Types fromDirection) {
+        public override IAction GetAction(IMap map, Direction fromDirection) {
             if (IsOpen) {
                 return new CloseDoor(this, map); 
             }

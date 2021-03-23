@@ -1,5 +1,5 @@
-﻿using Rogue.GameObjects;
-using SadRogue.Primitives;
+﻿using Core;
+using Rogue.GameObjects;
 using System.Collections.Generic;
 
 namespace Rogue.Map {
@@ -27,26 +27,26 @@ namespace Rogue.Map {
         }
 
         private List<GameObject> GetDecorationsLargeRoom(Room room, List<GameObject> gameObjects) {
-            var midPoint = room.Bounds.Center;
+            var midPoint = room.Bounds.Center();
             var table = new Table(midPoint);
             var chairLeft = new Chair(midPoint.Left());
             var chairRight = new Chair(midPoint.Right());
-            var sword = new Sword(new Point(room.Bounds.X, room.Bounds.MaxExtentY));
+            var sword = new Sword(new Core.Point(room.Bounds.X, room.Bounds.Bottom));
 
 
             return new List<GameObject> { table, chairLeft, chairRight, sword };
         }
 
         private List<GameObject> GetDecorationsMediumRoom(Room room, List<GameObject> gameObjects) {
-            var topLeftCorner = new Point(room.Bounds.X, room.Bounds.Y);
+            var topLeftCorner = new Core.Point(room.Bounds.X, room.Bounds.Y);
             var chair = new Chair(topLeftCorner);
-            var sword = new Sword(new Point(room.Bounds.X, room.Bounds.MaxExtentY));
+            var sword = new Sword(new Core.Point(room.Bounds.X, room.Bounds.Bottom));
 
             return new List<GameObject> { chair, sword };
         }
 
         private List<GameObject> GetDecorationsSmallRoom(Room room, List<GameObject> gameObjects) {
-            var midTopWall = new Point(room.Bounds.Center.X, room.Bounds.Y);
+            var midTopWall = new Point(room.Bounds.Center().X, room.Bounds.Y);
             var chestLeft = new Chest(midTopWall.Left());
             var chestRight = new Chest(midTopWall.Right());
 

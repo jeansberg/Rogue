@@ -2,8 +2,6 @@
 using NAudio.Wave.SampleProviders;
 using System;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Rogue.Services {
     public class AudioPlayer : IAudioPlayer {
@@ -11,18 +9,18 @@ namespace Rogue.Services {
         private Random rnd;
         private WaveOutEvent outputDevice;
         private MixingSampleProvider mixer;
-
+        
         public AudioPlayer() {
             rnd = new Random();
 
             outputDevice = new WaveOutEvent();
-            mixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(44100, 2));
+            mixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(48000, 2));
             mixer.ReadFully = true;
             outputDevice.Init(mixer);
             outputDevice.Play();
         }
 
-        public async Task PlaySound(string soundPattern) {
+        public void PlaySound(string soundPattern) {
             var matchingSoundFiles = System.IO.Directory.GetFiles(SfxPath, $"*{soundPattern}*", new System.IO.EnumerationOptions 
             {
                 MatchCasing = System.IO.MatchCasing.CaseInsensitive,

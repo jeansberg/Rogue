@@ -1,5 +1,5 @@
-﻿using RogueSharp;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Drawing;
 
 namespace Rogue
 {
@@ -23,6 +23,10 @@ namespace Rogue
             }
 
             return points;
+        }
+
+        public static Core.Point Center (this Rectangle rect) {
+            return new Core.Point((rect.Right - rect.Width) / 2, (rect.Bottom - rect.Y) / 2);
         }
     }
 }

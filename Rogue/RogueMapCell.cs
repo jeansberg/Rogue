@@ -1,20 +1,12 @@
-﻿using RogueSharp;
+﻿using Core;
+using RogueSharp;
 using SadRogue.Primitives;
 using System;
 
 namespace Rogue.MazeGenerator {
-    public enum CellType {
-        Wall,
-        RoomFloor,
-        Maze,
-        Connector,
-        DoorVertical,
-        DoorHorizontal,
-        RoomWallVertical,
-        RoomWallHorizontal
-    }
 
-    public class MapCell : Cell {
+
+    public class RogueMapCell : Cell {
         public CellType Type { get; set; }
         public Color Color =>
             Type switch {

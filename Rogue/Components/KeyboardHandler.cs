@@ -1,13 +1,14 @@
-﻿using Rogue.Consoles;
+﻿using Core;
+using Rogue.Consoles;
 using Rogue.GameObjects;
 using Rogue.Services;
 using SadConsole;
 using SadConsole.Components;
 using SadConsole.Input;
-using SadRogue.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Utilities.SadConsole;
 
 namespace Rogue.Components {
     public class KeyboardHandler : InputConsoleComponent {
@@ -160,8 +161,8 @@ namespace Rogue.Components {
             MoveOrAct(player, direction);
         }
 
-        private void TargetDirection(Direction.Types direction) {
-            if (direction != Direction.Types.None) {
+        private void TargetDirection(Direction direction) {
+            if (direction != Direction.None) {
                 var action = mapConsole.GetAction(player, actors, direction);
                 if (action != null) {
                     var result = action.Perform(player);
@@ -193,7 +194,7 @@ namespace Rogue.Components {
         private void MoveMissile(Missile missile, Point point) {
             missile.Location = point;
 
-            actors.FirstOrDefault(a => a.Location == point)?.GetAction(mapConsole.map, Direction.Types.None).Perform(player);
+            actors.FirstOrDefault(a => a.Location == point)?.GetAction(mapConsole.map, Direction.None).Perform(player);
         }
 
         private void UpdateActors() {
@@ -216,8 +217,7 @@ namespace Rogue.Components {
                 nextStep = target;
             }
 
-            var direction = Direction.GetDirection(actor.Location, nextStep);
-
+            var direction = DirectionExtensions.GetDirection(actor.Location, nextStep);
             MoveOrAct(actor, direction);
         }
 
@@ -238,7 +238,7 @@ namespace Rogue.Components {
         }
 
         public override void ProcessMouse(IScreenObject host, MouseScreenObjectState mouse, out bool handled) {
-            var mousePos = mouse.CellPosition + new Point(-1, -1);
+            var mousePos = mouse.CellPosition.ToPoint() + new Point(-1, -1);
 
             if (state == InputState.Targeting) {
                 trajectory = new List<Point>();
@@ -246,7 +246,7 @@ namespace Rogue.Components {
 
                 Algorithms.Line(playerPos.X, playerPos.Y, mousePos.X, mousePos.Y, (int x, int y) => {
                     Point point = new Point(x, y);
-                    if (!mapConsole.map.InBounds(point) || !mapConsole.map.IsWalkable(x, y)) {
+                    if (!mapConsole.map.InBounds(point) || !mapConsole.map.IsWalkable(point)) {
                         trajectory.Clear();
                         return false;
                     }
