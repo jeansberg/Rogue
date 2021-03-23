@@ -17,6 +17,9 @@ namespace Utilities.RogueSharp {
         }
 
         public IReadOnlyCollection<ICell> ComputeFov(int xOrigin, int yOrigin, int radius, bool lightWalls) {
+            var rogueSharpMap = map.ToRogueSharpMap();
+            Fov = new FieldOfView(rogueSharpMap);
+
             return Fov.ComputeFov(xOrigin, yOrigin, radius, lightWalls).Select(c => map.GetCellAt(new Core.Point(xOrigin, yOrigin))).ToList();
         }
 
