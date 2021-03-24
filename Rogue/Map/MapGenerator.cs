@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using Core;
@@ -75,7 +76,10 @@ namespace Rogue {
         }
 
         private void DecorateRooms(IMap map) {
-            roomDecorator.GetDecorations(Rooms, map.GameObjects.ToList(), Rnd);
+            var decorations = roomDecorator.GetDecorations(Rooms, Rnd);
+            map.GameObjects.AddRange(decorations);
+
+
         }
 
         private void ConnectRooms(IMap map) {
