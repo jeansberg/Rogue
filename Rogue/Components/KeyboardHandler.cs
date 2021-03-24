@@ -19,18 +19,19 @@ namespace Rogue.Components {
         private Actor player;
         private readonly InventoryConsole inventory;
         private List<Actor> actors;
+        private readonly Action startGame;
         private List<Action> actions;
         private Timer turnTimer;
         private List<Point> trajectory;
 
-        public KeyboardHandler(MapConsole mapConsole, LogConsole logConsole, MessageConsole messageConsole, Actor player, InventoryConsole inventory, List<Actor> actors) {
+        public KeyboardHandler(MapConsole mapConsole, LogConsole logConsole, MessageConsole messageConsole, Actor player, InventoryConsole inventory, List<Actor> actors, Action startGame) {
             this.mapConsole = mapConsole;
             this.logConsole = logConsole;
             this.messageConsole = messageConsole;
             this.player = player;
             this.inventory = inventory;
             this.actors = actors;
-
+            this.startGame = startGame;
             state = InputState.Idle;
             mapConsole.IsFocused = true;
             actions = new List<Action>();
@@ -129,6 +130,10 @@ namespace Rogue.Components {
         }
 
         public void Update(SadConsole.Console console, TimeSpan delta) {
+            if (player.Health < 1) {
+                startGame();
+            }
+
             if (!actions.Any()) {
                 return;
             }

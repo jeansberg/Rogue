@@ -11,7 +11,7 @@ namespace Rogue.Actions {
 
         public ActionResult Perform(Actor actor, bool defaultAction = false) {
             var damage = actor.Weapon == null ? 1 : 2;
-            target.Health -= damage;
+            target.Damage(damage);
 
             Locator.Audio.PlaySound("hit");
             return ActionResult.Succeed($"{actor.Name} attacked {target.Name} for {damage} damage", false);

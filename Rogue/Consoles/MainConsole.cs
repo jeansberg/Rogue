@@ -18,7 +18,7 @@ namespace Rogue.Consoles {
         private readonly Actor player;
         private readonly KeyboardHandler keyboardHandlerObject;
 
-        public MainConsole(MapConsole mapConsole, LogConsole logConsole, MessageConsole messageConsole, InventoryConsole inventory, List<Actor> actors) : base(80, 40) {
+        public MainConsole(MapConsole mapConsole, LogConsole logConsole, MessageConsole messageConsole, KeyboardHandler keyboardHandler, InventoryConsole inventory, List<Actor> actors) : base(80, 40) {
             this.mapConsole = mapConsole;
             this.logConsole = logConsole;
             this.messageConsole = messageConsole;
@@ -28,9 +28,9 @@ namespace Rogue.Consoles {
 
             this.Font = new Font(12, 12, 0, 16, 16, 0, new GameTexture(new SFML.Graphics.Texture("../../../Cheepicus_12x12.png")), "mapFont");
 
-            keyboardHandlerObject = new KeyboardHandler(mapConsole, logConsole, messageConsole, player, inventory, actors);
             GameHost.Instance.FocusedScreenObjects.Set(this);
 
+            keyboardHandlerObject = keyboardHandler;
             SadComponents.Add(keyboardHandlerObject);
 
             inventory.IsVisible = false;
