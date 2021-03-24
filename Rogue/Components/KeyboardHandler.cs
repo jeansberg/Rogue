@@ -163,24 +163,25 @@ namespace Rogue.Components {
 
         private void TargetDirection(Direction direction) {
             if (direction != Direction.None) {
-                var action = mapConsole.GetAction(player, actors, direction);
-                if (action != null) {
-                    var result = action.Perform(player);
-                    if (result.Outcome == Actions.Outcome.Success) {
-                        logConsole.Log(result.Message);
-                        messageConsole.SetMessage("");
+                var actions = mapConsole.GetAction(player, actors, direction);
+                if (actions.Count == 0) {
+                        messageConsole.SetMessage("Nothing to do");
                     }
-                    else {
-                        messageConsole.SetMessage(result.Message);
+                foreach(var action in actions) {
+                        var result = action.Perform(player);
+                        if (result.Outcome == Actions.Outcome.Success) {
+                            logConsole.Log(result.Message);
+                            messageConsole.SetMessage("");
+                        }
+                        else {
+                            messageConsole.SetMessage(result.Message);
+                        }
                     }
-                }
-                else {
-                    messageConsole.SetMessage("Nothing to do");
                 }
 
                 state = InputState.Idle;
-            }
         }
+        
 
         private void FireMissile(List<Point> trajectory) {
             Locator.Audio.PlaySound("missile");
@@ -222,18 +223,20 @@ namespace Rogue.Components {
         }
 
         private void MoveOrAct(Actor actor, Direction direction) {
-            var action = mapConsole.GetAction(actor, actors, direction);
-            if (action != null) {
-                var result = action.Perform(actor, true);
-                if (result.Outcome != Actions.Outcome.Canceled) {
-                    logConsole.Log(result.Message);
-                }
-                if (result.KeepMoving) {
-                    mapConsole.MoveActor(actor, actors, direction);
-                }
-            }
-            else {
+            var actions = mapConsole.GetAction(actor, actors, direction);
+            if (actions.Count == 0) {
                 mapConsole.MoveActor(actor, actors, direction);
+            }
+            else { 
+            foreach (var action in actions) {
+                    var result = action.Perform(actor, true);
+                    if (result.Outcome != Actions.Outcome.Canceled) {
+                        logConsole.Log(result.Message);
+                    }
+                    if (result.KeepMoving) {
+                        mapConsole.MoveActor(actor, actors, direction);
+                    }
+                }
             }
         }
 

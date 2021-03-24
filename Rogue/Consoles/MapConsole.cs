@@ -100,35 +100,18 @@ namespace Rogue.Consoles {
             return null;
         }
 
-        public IAction GetAction(Actor actor, List<Actor> actors, Direction direction) {
+        public List<IAction> GetAction(Actor actor, List<Actor> actors, Direction direction) {
             var location = actor.Location.Increment(direction);
 
             // Check actors first since they should always block
             var otherActor = actors.FirstOrDefault(g => g.Location == location && g != actor);
             if (otherActor != null && otherActor.IsAlive) {
-                return otherActor.GetAction(map, direction.Opposite());
+                return new List<IAction> { otherActor.GetAction(map, direction.Opposite()) };
             }
 
-            var gameObject = map.GameObjects.FirstOrDefault(g => g.Location == location);
-            if (gameObject != null) {
-                return gameObject.GetAction(map, direction.Opposite());
-            }
-
-            return null;
-        }
-
-        public IAction GetAction(Point location, Direction direction) {
-            var gameObject = map.GameObjects.FirstOrDefault(g => g.Location == location);
-            if (gameObject != null) {
-                return gameObject.GetAction(map, direction.Opposite());
-            }
-
-            var otherActor = map.Actors.FirstOrDefault(g => g.Location == location);
-            if (otherActor != null && otherActor.IsAlive) {
-                return otherActor.GetAction(map, direction.Opposite());
-            }
-
-            return null;
+            var gameObjects = map.GameObjects.Where(g => g.Location == location);
+            return gameObjects.Select(g => g.GetAction(map, direction.Opposite()))
+                .ToList();
         }
 
         private void DrawGameObjects(IEnumerable<GameObject> gameObjects, IFov fov) {
