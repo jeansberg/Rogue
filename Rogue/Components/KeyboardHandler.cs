@@ -1,4 +1,5 @@
 ﻿using Core;
+using Core.GameObjects;
 using Rogue.Consoles;
 using Rogue.GameObjects;
 using Rogue.Services;
@@ -114,8 +115,8 @@ namespace Rogue.Components {
                 else if (info.KeysPressed.Count > 0) {
                     var item = inventory.GetItem(info.KeysPressed[0].Key);
                     if (item != null) {
-                        player.Weapon = item;
-                        messageConsole.SetMessage($"{player.Name} Equipped {item.Name}");
+                        player.Weapon = ((Weapon)item);
+                        messageConsole.SetMessage($"{player.Name()} Equipped {item.Name()}");
                         ExitInventory();
                     }
                 }
@@ -139,7 +140,7 @@ namespace Rogue.Components {
             }
 
             if (turnTimer == null || turnTimer.IsPaused) {
-                turnTimer = new SadConsole.Components.Timer(TimeSpan.FromSeconds(0.2));
+                turnTimer = new Timer(TimeSpan.FromSeconds(0.2));
 
                 turnTimer.TimerElapsed += (timer, e) =>
                 {
@@ -168,7 +169,7 @@ namespace Rogue.Components {
 
         private void TargetDirection(Direction direction) {
             if (direction != Direction.None) {
-                var actions = mapConsole.GetAction(player, actors, direction);
+                var actions = mapConsole.GetActions(player, actors, direction);
                 if (actions.Count == 0) {
                         messageConsole.SetMessage("Nothing to do");
                     }
@@ -193,6 +194,9 @@ namespace Rogue.Components {
             var missile = new Missile(trajectory.First());
             mapConsole.map.GameObjects.Add(missile);
             foreach(var point in trajectory) {
+                if (!missile.Moving) {
+                    mapConsole.map.GameObjects.Remove(missile);
+                }
                 actions.Add(() => { MoveMissile(missile, point); });
             }
         }
@@ -200,7 +204,14 @@ namespace Rogue.Components {
         private void MoveMissile(Missile missile, Point point) {
             missile.Location = point;
 
-            actors.FirstOrDefault(a => a.Location == point)?.GetAction(mapConsole.map, Direction.None).Perform(player);
+            var actor = actors.SingleOrDefault(a => a.Location == point);
+            if (actor != null) {
+                missile.Moving = false;
+
+                var action = actor.GetAction(mapConsole.map, Direction.None);
+                var result = action.Perform(player);
+                logConsole.Log(result.Message);
+            }
         }
 
         private void UpdateActors() {
@@ -210,6 +221,12 @@ namespace Rogue.Components {
                     actions.Add(() => { MoveTo(actor, player.Location); });
                 }
             }
+
+            var actorsToRemove = new List<Actor>();
+            foreach (var actor in actors.Where(a => !a.IsAlive)) {
+                actorsToRemove.Add(actor);
+            }
+            actorsToRemove.ForEach(a => actors.Remove(a));
         }
 
         private void MoveTo(Actor actor, Point target) {
@@ -228,7 +245,7 @@ namespace Rogue.Components {
         }
 
         private void MoveOrAct(Actor actor, Direction direction) {
-            var actions = mapConsole.GetAction(actor, actors, direction);
+            var actions = mapConsole.GetActions(actor, actors, direction);
             if (actions.Count == 0) {
                 mapConsole.MoveActor(actor, actors, direction);
             }
@@ -281,7 +298,7 @@ namespace Rogue.Components {
             var actor = actors
                 .SingleOrDefault(a => a.Location == mousePos && player.Fov.IsInFov(a.Location.X, a.Location.Y));
             if (actor != null) {
-                messageConsole.SetMessage(actor.Name);
+                messageConsole.SetMessage(actor.Name());
             }
 
             handled = true;

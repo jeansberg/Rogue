@@ -25,9 +25,9 @@ namespace Rogue.Consoles {
                 return;
             }
 
-            var foreground = visibility == Visibility.InFov ? gameObject.Color.ToSadColor() : gameObject.Color.ToSadColor().GetDarker();
+            var foreground = visibility == Visibility.InFov ? gameObject.Color().ToSadColor() : gameObject.Color().ToSadColor().GetDarker();
             console.Cursor.Position = gameObject.Location.ToSadPoint();
-            Draw(console, foreground, gameObject.GlyphId);
+            Draw(console, foreground, gameObject.GlyphId());
         }
 
         public static void Draw(this Console console, Point point, ColoredGlyph glyph) {

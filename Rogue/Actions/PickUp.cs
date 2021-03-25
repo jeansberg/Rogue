@@ -21,7 +21,7 @@ namespace Rogue.Actions {
                 Locator.Audio.PlaySound("weaponPickup");
             }
 
-            return ActionResult.Succeed($"Picked up {item.Name}", true);
+            return ActionResult.Succeed($"Picked up {item.Name()}", true);
         }
     }
 }

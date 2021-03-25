@@ -21,13 +21,14 @@ namespace Rogue {
         private int RoomMaxWidth;
         private int RoomMinHeight;
         private int RoomMaxHeight;
+        private readonly int Level;
 
         public Random Rnd { get; }
         private List<Room> Rooms;
 
-        private readonly RoomDecorator roomDecorator;
+        private readonly RoomDecorator RoomDecorator;
 
-        public MapGenerator(RoomDecorator roomDecorator, int width, int height, int roomAttempts, int roomMinWidth, int roomMaxWidth, int roomMinHeight, int roomMaxHeight) {
+        public MapGenerator(RoomDecorator roomDecorator, int width, int height, int roomAttempts, int roomMinWidth, int roomMaxWidth, int roomMinHeight, int roomMaxHeight, int level) {
             Width = width;
             Height = height;
             RoomAttempts = roomAttempts;
@@ -35,8 +36,9 @@ namespace Rogue {
             RoomMaxWidth = roomMaxWidth;
             RoomMinHeight = roomMinHeight;
             RoomMaxHeight = roomMaxHeight;
+            Level = level;
             Rnd = new Random();
-            this.roomDecorator = roomDecorator;
+            RoomDecorator = roomDecorator;
         }
 
         public IMap GenerateMap()
@@ -63,6 +65,8 @@ namespace Rogue {
         }
 
         private void SpawnMonster(Room room, IMap map) {
+            var monsterType = GetMonsterType();
+
             Point location;
             do {
                 var x = Rnd.Next(room.Bounds.X, room.Bounds.Right);
@@ -72,11 +76,22 @@ namespace Rogue {
             while (map.GameObjects.Any(g => g.Location == location));
 
             map.Actors
-                .Add(new Monster(location, Color.Green, 2, 2, "Monster", new RogueSharpFov(map)));
+                .Add(new Monster(monsterType, location, new RogueSharpFov(map)));
+        }
+
+        private MonsterType GetMonsterType() {
+            var inLevelRange = new List<MonsterType>();
+            foreach(MonsterType type in Enum.GetValues(typeof(MonsterType))) {
+                var range = Monster.LevelRange(type);
+                if (Level >= range.MinLevel && Level <= range.MaxLevel) {
+                    inLevelRange.Add(type);
+                }
+            }
+            return inLevelRange[Rnd.Next(0, inLevelRange.Count)];
         }
 
         private void DecorateRooms(IMap map) {
-            var decorations = roomDecorator.GetDecorations(Rooms, Rnd);
+            var decorations = RoomDecorator.GetDecorations(Rooms, Level, Rnd);
             map.GameObjects.AddRange(decorations);
 
 

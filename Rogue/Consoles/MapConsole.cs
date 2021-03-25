@@ -56,7 +56,7 @@ namespace Rogue.Consoles {
 
         public bool MoveActor(Actor actor, List<Actor> actors, Direction dir) {
             var newPoint = actor.Location.Increment(dir);
-            if (!map.InBounds(newPoint) || !map.IsWalkable(newPoint)) {
+            if (!map.InBounds(newPoint) || !map.IsWalkable(newPoint) || actors.Any(actor => actor.Location == newPoint)) {
                 return false;
             }
 
@@ -100,7 +100,7 @@ namespace Rogue.Consoles {
             return null;
         }
 
-        public List<IAction> GetAction(Actor actor, List<Actor> actors, Direction direction) {
+        public List<IAction> GetActions(Actor actor, List<Actor> actors, Direction direction) {
             var location = actor.Location.Increment(direction);
 
             // Check actors first since they should always block

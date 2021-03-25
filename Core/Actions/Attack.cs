@@ -4,17 +4,19 @@ using Rogue.Services;
 namespace Rogue.Actions {
     public class Attack : IAction {
         private readonly Actor target;
+        private readonly Missile? missile;
 
-        public Attack(Actor target) {
+        public Attack(Actor target, Missile? missile) {
             this.target = target;
+            this.missile = missile;
         }
 
         public ActionResult Perform(Actor actor, bool defaultAction = false) {
-            var damage = actor.Weapon == null ? 1 : 2;
+            var damage = new DamageRange(target, actor, missile).GetDamage();
             target.Health -= damage;
 
             Locator.Audio.PlaySound("hit");
-            return ActionResult.Succeed($"{actor.Name} attacked {target.Name} for {damage} damage", false);
+            return ActionResult.Succeed($"{actor.Name()} attacked {target.Name()} for {damage} damage", false);
         }
     }
 }

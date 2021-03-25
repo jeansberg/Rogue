@@ -4,7 +4,7 @@ using Rogue.Actions;
 
 namespace Rogue.GameObjects {
     public class Door : GameObject {
-        public Door(Point location, Orientation orientation) : base(location, System.Drawing.Color.SaddleBrown, orientation == Orientation.Vertical ? 179 : 196, "door") {
+        public Door(Point location, Orientation orientation) : base(location) {
             Orientation = orientation;
             IsOpen = false;
             OriginalOrientation = orientation;
@@ -18,12 +18,24 @@ namespace Rogue.GameObjects {
 
         public bool IsOpen { get; set; }
 
+        public override System.Drawing.Color Color() {
+            return System.Drawing.Color.SaddleBrown;
+        }
+
         public override IAction GetAction(IMap map, Direction fromDirection) {
             if (IsOpen) {
                 return new CloseDoor(this, map); 
             }
 
             return new OpenDoor(fromDirection, this, map);
+        }
+
+        public override int GlyphId() {
+            return Orientation == Orientation.Vertical ? 179 : 196;
+        }
+
+        public override string Name() {
+            return "Door";
         }
     }
 }

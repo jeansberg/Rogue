@@ -14,14 +14,18 @@ namespace Rogue.Actions {
         }
 
         public ActionResult Perform(Actor actor, bool defaultAction = false) {
-            actor.Inventory.Add(item);
-            map.RemoveGameObject(item);
+            if (actor is Player) {
+                actor.Inventory.Add(item);
+                map.RemoveGameObject(item);
 
-            if (item.Type == GameObjectType.Weapon) {
-                Locator.Audio.PlaySound("weaponPickup");
+                if (item.Type == GameObjectType.Weapon) {
+                    Locator.Audio.PlaySound("weaponPickup");
+                }
+
+                return ActionResult.Succeed($"Picked up {item.Name()}", true);
             }
 
-            return ActionResult.Succeed($"Picked up {item.Name}", true);
+            return ActionResult.Cancel("", true);
         }
     }
 }

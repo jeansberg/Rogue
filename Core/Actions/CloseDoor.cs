@@ -23,12 +23,6 @@ namespace Rogue.Actions {
             }
 
             door.Orientation = door.OriginalOrientation;
-            if (door.Orientation == Orientation.Vertical) {
-                door.GlyphId = 179;
-            }
-            else {
-                door.GlyphId = 196;
-            }
 
             door.Location = door.OriginalLocation;
 

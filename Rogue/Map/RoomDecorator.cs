@@ -1,13 +1,13 @@
-﻿using Core;
-using Core.Interfaces;
+﻿using Core.GameObjects;
 using Rogue.GameObjects;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+using System.Drawing;
+using Point = Core.Point;
 
 namespace Rogue.Map {
     public class RoomDecorator {
-        public List<GameObject> GetDecorations(List<Room> rooms, System.Random rnd) {
+        public List<GameObject> GetDecorations(List<Room> rooms, int level, Random rnd) {
             var decorations = new List<GameObject>();
             
             foreach(var room in rooms) {
@@ -18,9 +18,9 @@ namespace Rogue.Map {
                 var size = room.Bounds.Width * room.Bounds.Height;
                 
                 if (size > 25) {
-                    decorations.AddRange(GetDecorationsLargeRoom(room));
+                    decorations.AddRange(GetDecorationsLargeRoom(room, level, rnd));
                 } else if (size > 20) {
-                    decorations.AddRange(GetDecorationsMediumRoom(room));
+                    decorations.AddRange(GetDecorationsMediumRoom(room, level, rnd));
                 } else {
                     decorations.AddRange(GetDecorationsSmallRoom(room));
                 }
@@ -29,22 +29,22 @@ namespace Rogue.Map {
             return decorations;
         }
 
-        private List<GameObject> GetDecorationsLargeRoom(Room room) {
+        private List<GameObject> GetDecorationsLargeRoom(Room room, int level, Random rnd) {
             var midPoint = room.Bounds.Center();
             var table = new Table(midPoint);
             var chairLeft = new Chair(midPoint.Left());
             var chairRight = new Chair(midPoint.Right());
-            var sword = new Sword(new Core.Point(room.Bounds.X, room.Bounds.Bottom - 1));
+            var weapon = SpawnWeapon(new Point(room.Bounds.X, room.Bounds.Bottom - 1), level, rnd);
 
-            return new List<GameObject> { table, chairLeft, chairRight, sword };
+            return new List<GameObject> { table, chairLeft, chairRight, weapon };
         }
 
-        private List<GameObject> GetDecorationsMediumRoom(Room room) {
+        private List<GameObject> GetDecorationsMediumRoom(Room room, int level, Random rnd) {
             var topLeftCorner = new Core.Point(room.Bounds.X, room.Bounds.Y);
             var chair = new Chair(topLeftCorner);
-            var sword = new Sword(new Core.Point(room.Bounds.X, room.Bounds.Bottom - 1));
+            var weapon = SpawnWeapon(new Point(room.Bounds.X, room.Bounds.Bottom - 1), level, rnd);
 
-            return new List<GameObject> { chair, sword };
+            return new List<GameObject> { chair, weapon };
         }
 
         private List<GameObject> GetDecorationsSmallRoom(Room room) {
@@ -53,6 +53,22 @@ namespace Rogue.Map {
             var chestRight = new Chest(midTopWall);
 
             return new List<GameObject> { chestLeft, chestRight };
+        }
+
+        private Weapon SpawnWeapon(Point location, int level, Random rnd) {
+            var weaponType = GetWeaponType(level, rnd);
+
+            return new Weapon(location, weaponType);
+        }
+
+        private WeaponType GetWeaponType(int level, Random rnd) {
+            if (level == 1) {
+                return WeaponType.Mace;
+            }
+            else {
+                var type = rnd.Next(1, 4);
+                return (WeaponType)type;
+            }
         }
     }
 }

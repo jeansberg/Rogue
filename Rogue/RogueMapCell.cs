@@ -14,8 +14,8 @@ namespace Rogue.MazeGenerator {
             CellType.RoomFloor => Color.Gray,
             CellType.Maze => Color.Gray,
             CellType.Connector => Color.Gray,
-            CellType.DoorVertical => Color.Brown,
-            CellType.DoorHorizontal => Color.Brown,
+            CellType.DoorVertical => Color.SaddleBrown,
+            CellType.DoorHorizontal => Color.SaddleBrown,
             CellType.RoomWallVertical => Color.Gray,
             CellType.RoomWallHorizontal => Color.Gray,
                 _ => throw new NotImplementedException()

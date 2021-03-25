@@ -1,22 +1,23 @@
 ﻿using Core;
+using Core.GameObjects;
 using Core.Interfaces;
 using Rogue.Actions;
 using System.Collections.Generic;
 
 namespace Rogue.GameObjects {
-    public class Actor : GameObject {
+    public abstract class Actor : GameObject {
         public int Health { get; set; }
         public bool IsAlive => Health > 0;
         public IFov Fov { get; set; }
         public List<GameObject> Inventory { get; set; }
-        public GameObject Weapon { get; set; }
+        public Weapon Weapon { get; set; }
 
         public virtual void Damage(int damage) {
             Health -= damage;
         }
 
-        public Actor(Point location, System.Drawing.Color color, int glyphId, int health, string name, IFov fov) :
-            base(location, color, glyphId, name) {
+        public Actor(Point location, int health, IFov fov) :
+            base(location) {
             Health = health;
             Fov = fov;
 
@@ -24,7 +25,11 @@ namespace Rogue.GameObjects {
         }
 
         public override IAction GetAction(IMap map, Direction from) {
-            return new Attack(this);
+           return Attack(null);
+        }
+
+        public Attack Attack(Missile? missile) {
+            return new Attack(this, missile);
         }
     }
 }

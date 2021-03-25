@@ -14,7 +14,7 @@ namespace Rogue.Actions {
             target.Damage(damage);
 
             Locator.Audio.PlaySound("hit");
-            return ActionResult.Succeed($"{actor.Name} attacked {target.Name} for {damage} damage", false);
+            return ActionResult.Succeed($"{actor.Name()} attacked {target.Name()} for {damage} damage", false);
         }
     }
 }

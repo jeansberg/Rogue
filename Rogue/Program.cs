@@ -3,6 +3,7 @@ using Rogue.Components;
 using Rogue.Consoles;
 using Rogue.GameObjects;
 using Rogue.Services;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -20,18 +21,17 @@ namespace Rogue {
 
         static void Main(string[] args) {
             Locator.RegisterAudioPlayer(new AudioPlayer());
+            Locator.RegisterDiceRoller(new DiceRoller(new System.Random(DateTime.Now.Millisecond)));
 
             StartGame();
         }
 
         private static void StartGame() {
-            var generator = new MapGenerator(new Map.RoomDecorator(), Width, Height, 100, 3, 9, 3, 9);
+            var generator = new MapGenerator(new Map.RoomDecorator(), Width, Height, 100, 3, 9, 3, 9, 1);
 
             map = generator.GenerateMap();
 
             player = new Player(new Point(0, 0), Color.Yellow, new RogueSharpFov(map));
-            player.Inventory.Add(new Sword(new Point()));
-            player.Inventory.Add(new Spear(new Point()));
 
             actors = new List<Actor> {
                 player,
