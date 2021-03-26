@@ -31,7 +31,7 @@ namespace Rogue {
 
             map = generator.GenerateMap();
 
-            player = new Player(new Point(0, 0), Color.Yellow, new RogueSharpFov(map));
+            player = new Player(new Point(0, 0), new RogueSharpFov(map));
 
             actors = new List<Actor> {
                 player,

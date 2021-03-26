@@ -1,5 +1,4 @@
 ﻿using Core;
-using Core.GameObjects;
 using Core.Interfaces;
 using Rogue.Actions;
 using System.Collections.Generic;
@@ -10,7 +9,6 @@ namespace Rogue.GameObjects {
         public bool IsAlive => Health > 0;
         public IFov Fov { get; set; }
         public List<GameObject> Inventory { get; set; }
-        public Weapon Weapon { get; set; }
 
         public virtual void Damage(int damage) {
             Health -= damage;

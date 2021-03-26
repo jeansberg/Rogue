@@ -17,7 +17,7 @@ namespace Rogue.Components {
         private InputState state;
         private MapConsole mapConsole;
         private readonly LogConsole logConsole;
-        private Actor player;
+        private Player player;
         private readonly InventoryConsole inventory;
         private List<Actor> actors;
         private readonly Action startGame;
@@ -25,7 +25,7 @@ namespace Rogue.Components {
         private Timer turnTimer;
         private List<Point> trajectory;
 
-        public KeyboardHandler(MapConsole mapConsole, LogConsole logConsole, MessageConsole messageConsole, Actor player, InventoryConsole inventory, List<Actor> actors, Action startGame) {
+        public KeyboardHandler(MapConsole mapConsole, LogConsole logConsole, MessageConsole messageConsole, Player player, InventoryConsole inventory, List<Actor> actors, Action startGame) {
             this.mapConsole = mapConsole;
             this.logConsole = logConsole;
             this.messageConsole = messageConsole;

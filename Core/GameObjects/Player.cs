@@ -1,10 +1,11 @@
 ﻿using Core;
+using Core.GameObjects;
 using Core.Interfaces;
 using Color = System.Drawing.Color;
 
 namespace Rogue.GameObjects {
     public class Player : Actor {
-        private string name;
+        private readonly string name;
         private int Experience;
         public int Level { get {
                 if (Experience < 10) {
@@ -25,9 +26,12 @@ namespace Rogue.GameObjects {
 
             }}
 
-        public Player(Point location, Color color, IFov fov, string name = "Player") : base(location, 10, fov) {
+        public Player(Point location, IFov fov, string name = "Player") : base(location, 10, fov) {
             this.name = name;
+            Experience = 0;
         }
+
+        public Weapon? Weapon { get; set; }
 
         public override Color Color() {
             return System.Drawing.Color.Yellow;
