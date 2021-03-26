@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Utilities.SadConsole;
+using Orientation = Core.Orientation;
 
 namespace Rogue.Components {
     public class KeyboardHandler : InputConsoleComponent {
@@ -24,6 +25,7 @@ namespace Rogue.Components {
         private List<Action> actions;
         private Timer turnTimer;
         private List<Point> trajectory;
+        private bool playerMoved;
 
         public KeyboardHandler(MapConsole mapConsole, LogConsole logConsole, MessageConsole messageConsole, Player player, InventoryConsole inventory, List<Actor> actors, Action startGame) {
             this.mapConsole = mapConsole;
@@ -44,7 +46,7 @@ namespace Rogue.Components {
                 return;
             }
 
-            var playerMoved = false;
+            playerMoved = false;
             if (state == InputState.Idle) {
                 if (info.IsKeyPressed(Keys.Down)) {
                     MovePlayer(Direction.Down);
@@ -135,6 +137,8 @@ namespace Rogue.Components {
                 startGame();
             }
 
+            mapConsole.map.GameObjects.RemoveAll(g => g is Missile m && !m.Moving);
+
             if (!actions.Any()) {
                 return;
             }
@@ -189,22 +193,31 @@ namespace Rogue.Components {
         }
         
 
-        private void FireMissile(List<Point> trajectory) {
+        private void FireMissile(List<Point> trajectory, Player shooter) {
             Locator.Audio.PlaySound("missile");
             var missile = new Missile(trajectory.First());
             mapConsole.map.GameObjects.Add(missile);
-            foreach(var point in trajectory) {
-                if (!missile.Moving) {
-                    mapConsole.map.GameObjects.Remove(missile);
+            for (int step = 1; step < trajectory.Count; step++) {
+                Point point = trajectory[step];
+                if (step == trajectory.Count - 1) {
+                    actions.Add(() => { MoveMissile(missile, shooter, point, false); });
                 }
-                actions.Add(() => { MoveMissile(missile, point); });
+                else {
+                    actions.Add(() => { MoveMissile(missile, shooter, point, true); });
+                }
             }
         }
 
-        private void MoveMissile(Missile missile, Point point) {
+        private void MoveMissile(Missile missile, Actor shooter, Point point, bool keepMoving) {
+            var direction = DirectionExtensions.GetDirection(missile.Location, point);
+            missile.Orientation = direction switch {
+                Direction.Left => Orientation.Horizontal,
+                Direction.Right => Orientation.Horizontal,
+                _ => Orientation.Vertical
+            };
             missile.Location = point;
 
-            var actor = actors.SingleOrDefault(a => a.Location == point);
+            var actor = actors.SingleOrDefault(a => a.Location == point && a != shooter);
             if (actor != null) {
                 missile.Moving = false;
 
@@ -212,21 +225,23 @@ namespace Rogue.Components {
                 var result = action.Perform(player);
                 logConsole.Log(result.Message);
             }
+
+            missile.Moving = missile.Moving && keepMoving;
+
+            if (!missile.Moving) {
+                UpdateActors();
+            }
         }
 
         private void UpdateActors() {
-            foreach (var actor in actors.Where(a => a != player && a.IsAlive)) {
+            actors.RemoveAll(a => !a.IsAlive);
+
+            foreach (var actor in actors.Where(a => a != player)) {
                 actor.Fov.ComputeFov(actor.Location.X, actor.Location.Y, 5, true);
                 if (player.IsAlive && actor.Fov.IsInFov(player.Location.X, player.Location.Y)) {
                     actions.Add(() => { MoveTo(actor, player.Location); });
                 }
             }
-
-            var actorsToRemove = new List<Actor>();
-            foreach (var actor in actors.Where(a => !a.IsAlive)) {
-                actorsToRemove.Add(actor);
-            }
-            actorsToRemove.ForEach(a => actors.Remove(a));
         }
 
         private void MoveTo(Actor actor, Point target) {
@@ -276,20 +291,19 @@ namespace Rogue.Components {
                         return false;
                     }
 
-                    if (playerPos != point) {
-                        trajectory.Add(point);
-                    }
+                    trajectory.Add(point);
+                    
                     return true;
                 });
 
-                mapConsole.overlayPoints = trajectory;
+                mapConsole.overlayPoints = trajectory.Skip(1).ToList();
 
-                if (mouse.Mouse.LeftClicked && trajectory.Any()) {
+                if (mouse.Mouse.LeftClicked && trajectory.Any() && trajectory.Count > 1) {
                     if (playerPos.X > mousePos.X || playerPos.Y > mousePos.Y) {
                         trajectory.Reverse();
                     }
 
-                    FireMissile(trajectory);
+                    FireMissile(trajectory, player);
                     state = InputState.Idle;
                     mapConsole.overlayPoints.Clear();
                 }

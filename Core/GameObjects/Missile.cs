@@ -21,7 +21,7 @@ namespace Rogue.GameObjects {
         }
 
         public override int GlyphId() {
-            return 45;
+            return Orientation == Orientation.Horizontal ? 196 : 179;
         }
 
         public override string Name() {
