@@ -190,8 +190,8 @@ namespace Rogue {
             for (int i = 0; i < RoomAttempts; i++) {
                 var width = GetOddNumber(RoomMinWidth, RoomMaxWidth);
                 var height = GetOddNumber(RoomMinHeight, RoomMaxHeight);
-                int xPos = GetOddNumber(2, Width - width);
-                var yPos = GetOddNumber(2, Height - height);
+                int xPos = GetOddNumber(1, Width - width - 2);
+                var yPos = GetOddNumber(1, Height - height);
 
                 Rectangle newRoom = new Rectangle(xPos, yPos, width, height);
                 if (!OverLapsRoom(newRoom)) {
@@ -202,15 +202,27 @@ namespace Rogue {
         }
 
         private int GetOddNumber(int min, int max) {
-            var number = Rnd.Next(min, max);
+            if (min % 2 == 0 ||max % 2 == 0) {
+                throw new Exception("Min and max size should be odd numbers.");
+            }
+
+            var number = Rnd.Next(min, max + 1);
 
             var upOrDown = Rnd.Next(0, 2);
 
             number = number % 2 == 0 ? 
-                (upOrDown == 0 ? number++ : number--) :
+                (upOrDown == 0 ? number + 1 : number - 1) :
                 number;
 
-            return Math.Clamp(number, 1, max);
+            if (number < min) {
+                return min;
+            }
+
+            if (number > max) {
+                return max;
+            }
+
+            return number;
         }
 
         private bool OverLapsRoom(Rectangle newRoom)
