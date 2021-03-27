@@ -67,7 +67,7 @@ namespace Rogue.GameObjects {
             MonsterType.Orc => 5,
             MonsterType.Kestrel => 1,
             MonsterType.IceMonster => 15,
-            MonsterType.Snake => throw new NotImplementedException(),
+            MonsterType.Snake => 1,
         };
     }
 }

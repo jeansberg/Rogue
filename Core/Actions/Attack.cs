@@ -15,6 +15,10 @@ namespace Rogue.Actions {
             var damage = new DamageRange(target, actor, missile).GetDamage();
             target.Health -= damage;
 
+            if (!target.IsAlive && actor is Player p) {
+                p.Experience += Monster.ExperienceReward(((Monster)target).MonsterType);
+            }
+
             Locator.Audio.PlaySound("hit");
             return ActionResult.Succeed($"{actor.Name()} attacked {target.Name()} for {damage} damage", false);
         }

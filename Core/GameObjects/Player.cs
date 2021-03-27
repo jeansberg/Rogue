@@ -6,7 +6,7 @@ using Color = System.Drawing.Color;
 namespace Rogue.GameObjects {
     public class Player : Actor {
         private readonly string name;
-        private int Experience;
+        public int Experience { get; set; }
         public int Level { get {
                 if (Experience < 10) {
                     return 1;
