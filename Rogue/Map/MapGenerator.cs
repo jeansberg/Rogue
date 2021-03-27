@@ -159,9 +159,10 @@ namespace Rogue {
 
         private void CreateDoor(IMap map, Rectangle room, ICell connector) {
             connector.Type = CellType.Maze;
+            var orientation = (connector.Location.X == room.X - 1 || connector.Location.X == room.Right) ? Orientation.Vertical : Orientation.Horizontal;
             var door = new Door(
                 connector.Location, 
-                (connector.Location.X == room.X - 1 || connector.Location.X == room.Right + 1) ? Orientation.Vertical : Orientation.Horizontal);
+                orientation);
 
             map.GameObjects.Add(door);
 
