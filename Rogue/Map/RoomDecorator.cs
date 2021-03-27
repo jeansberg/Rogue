@@ -1,4 +1,5 @@
-﻿using Core.GameObjects;
+﻿using Core;
+using Core.GameObjects;
 using Rogue.GameObjects;
 using System;
 using System.Collections.Generic;
@@ -48,11 +49,28 @@ namespace Rogue.Map {
         }
 
         private List<GameObject> GetDecorationsSmallRoom(Room room) {
-            var midTopWall = new Point(room.Bounds.Center().X, room.Bounds.Y);
-            var chestLeft = new Chest(midTopWall.Left());
-            var chestRight = new Chest(midTopWall);
+            var doorSides = room.GetDoorSides();
 
-            return new List<GameObject> { chestLeft, chestRight };
+            Chest chest1;
+            Chest chest2;
+            if (!doorSides.Contains(Direction.Up)) {
+                chest1 = new Chest(room.MidTop().Left());
+                chest2 = new Chest(room.MidTop().Right());
+            }
+            else if (!doorSides.Contains(Direction.Left)) {
+                chest1 = new Chest(room.MidLeft().Up());
+                chest2 = new Chest(room.MidLeft().Down());
+            }
+            else if (!doorSides.Contains(Direction.Down)) {
+                chest1 = new Chest(room.MidBottom().Left());
+                chest2 = new Chest(room.MidBottom().Right());
+            }
+            else {
+                chest1 = new Chest(room.MidRight().Up());
+                chest2 = new Chest(room.MidRight().Down());
+            }
+
+            return new List<GameObject> { chest1, chest2};
         }
 
         private Weapon SpawnWeapon(Point location, int level, Random rnd) {

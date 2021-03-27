@@ -26,7 +26,7 @@ namespace Rogue
         }
 
         public static Core.Point Center (this Rectangle rect) {
-            return new Core.Point((rect.Right - rect.Width / 2) , (rect.Bottom - rect.Height / 2));
+            return new Core.Point((rect.Right - rect.Width / 2) - 1 , (rect.Bottom - rect.Height / 2) - 1);
         }
     }
 }

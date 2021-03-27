@@ -116,14 +116,14 @@ namespace Rogue {
                 if (connectors.Any()) {
                     var connector = connectors[Rnd.Next(0, connectors.Count)];
                     
-                    CreateDoor(map, bounds, connector);
+                    CreateDoor(map, room, connector);
                     if (connectors.Count > 1 && Rnd.Next(0, 2) == 1) {
                         connectors.Remove(connector);
                         var secondConnector = connectors[Rnd.Next(0, connectors.Count)];
                         if (map.GetAdjacent(secondConnector.Location).Any(HasDoor(map))) {
                             continue;
                         }
-                        CreateDoor(map, bounds, secondConnector);
+                        CreateDoor(map, room, secondConnector);
                     }
                 }
                 else {
@@ -157,9 +157,10 @@ namespace Rogue {
             return c => c.Type == CellType.Wall || c.Type == CellType.RoomWallHorizontal || c.Type == CellType.RoomWallVertical;
         }
 
-        private void CreateDoor(IMap map, Rectangle room, ICell connector) {
+        private void CreateDoor(IMap map, Room room, ICell connector) {
             connector.Type = CellType.Maze;
-            var orientation = (connector.Location.X == room.X - 1 || connector.Location.X == room.Right) ? Orientation.Vertical : Orientation.Horizontal;
+            room.DoorLocations.Add(connector.Location);
+            var orientation = (connector.Location.X == room.Bounds.X - 1 || connector.Location.X == room.Bounds.Right) ? Orientation.Vertical : Orientation.Horizontal;
             var door = new Door(
                 connector.Location, 
                 orientation);
@@ -192,7 +193,7 @@ namespace Rogue {
                 var width = GetOddNumber(RoomMinWidth, RoomMaxWidth);
                 var height = GetOddNumber(RoomMinHeight, RoomMaxHeight);
                 int xPos = GetOddNumber(1, Width - width - 2);
-                var yPos = GetOddNumber(1, Height - height);
+                var yPos = GetOddNumber(1, Height - height - 2);
 
                 Rectangle newRoom = new Rectangle(xPos, yPos, width, height);
                 if (!OverLapsRoom(newRoom)) {
