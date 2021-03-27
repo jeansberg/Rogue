@@ -3,8 +3,8 @@
         Bat,
         Hobgoblin,
         Orc,
-        Jackal,
-        Kobold,
+        Kestrel,
+        IceMonster,
         Snake
     }
 }

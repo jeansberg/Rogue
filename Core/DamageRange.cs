@@ -5,13 +5,10 @@ using System;
 namespace Rogue {
 
     public class DamageRange {
-
-        private Actor target;
         private readonly Actor attacker;
         private Missile? missile;
 
         public DamageRange(Actor target, Actor attacker, Missile? missile) {
-            this.target = target;
             this.attacker = attacker;
             this.missile = missile;
         }
@@ -24,8 +21,8 @@ namespace Rogue {
                     MonsterType.Bat => diceRoller.RollDice(1, 2),
                     MonsterType.Hobgoblin => diceRoller.RollDice(1, 8),
                     MonsterType.Orc => diceRoller.RollDice(1, 8),
-                    MonsterType.Jackal => diceRoller.RollDice(1, 2),
-                    MonsterType.Kobold => diceRoller.RollDice(1, 4),
+                    MonsterType.Kestrel => diceRoller.RollDice(1, 2),
+                    MonsterType.IceMonster => diceRoller.RollDice(1, 2),
                     MonsterType.Snake => diceRoller.RollDice(1, 3),
                     _ => throw new NotImplementedException(),
                 },

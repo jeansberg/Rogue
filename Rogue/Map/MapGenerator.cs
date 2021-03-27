@@ -82,7 +82,7 @@ namespace Rogue {
         private MonsterType GetMonsterType() {
             var inLevelRange = new List<MonsterType>();
             foreach(MonsterType type in Enum.GetValues(typeof(MonsterType))) {
-                var range = Monster.LevelRange(type);
+                var range = Monster.DungeonLevelRange(type);
                 if (Level >= range.MinLevel && Level <= range.MaxLevel) {
                     inLevelRange.Add(type);
                 }

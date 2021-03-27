@@ -16,8 +16,8 @@ namespace Rogue.GameObjects {
                 MonsterType.Bat => 1,
                 MonsterType.Hobgoblin => 1,
                 MonsterType.Orc => 1,
-                MonsterType.Jackal => 1,
-                MonsterType.Kobold => 1,
+                MonsterType.Kestrel => 1,
+                MonsterType.IceMonster => 1,
                 MonsterType.Snake => 1,
                 _ => throw new NotImplementedException(),
             };
@@ -33,8 +33,8 @@ namespace Rogue.GameObjects {
             MonsterType.Hobgoblin => 104,
             MonsterType.Bat => 98,
             MonsterType.Orc => 79,
-            MonsterType.Jackal => 106,
-            MonsterType.Kobold => 107,
+            MonsterType.Kestrel => 107,
+            MonsterType.IceMonster => 73,
             MonsterType.Snake => 115,
             _ => throw new NotImplementedException(),
         };
@@ -45,20 +45,29 @@ namespace Rogue.GameObjects {
             MonsterType.Hobgoblin => "Hobgoblin",
             MonsterType.Bat => "Bat",
             MonsterType.Orc => "Orc",
-            MonsterType.Jackal => "Jackal",
-            MonsterType.Kobold => "Kobold",
+            MonsterType.Kestrel => "Kestrel",
+            MonsterType.IceMonster => "Ice monster",
             MonsterType.Snake => "Snake",
             _ => throw new System.NotImplementedException(),
         };
 
-        public static (int MinLevel, int MaxLevel) LevelRange(MonsterType type) => type switch {
+        public static (int MinLevel, int MaxLevel) DungeonLevelRange(MonsterType type) => type switch {
             MonsterType.Bat => (1, 8),
             MonsterType.Hobgoblin => (1, 10),
             MonsterType.Orc => (4, 13),
-            MonsterType.Jackal => (1, 7),
-            MonsterType.Kobold => (1, 6),
+            MonsterType.Kestrel => (1, 6),
+            MonsterType.IceMonster => (1, 10),
             MonsterType.Snake => (1, 9),
             _ => throw new System.NotImplementedException(),
+        };
+
+        public static int ExperienceReward(MonsterType type) => type switch {
+            MonsterType.Bat => 1,
+            MonsterType.Hobgoblin => 3,
+            MonsterType.Orc => 5,
+            MonsterType.Kestrel => 1,
+            MonsterType.IceMonster => 15,
+            MonsterType.Snake => throw new NotImplementedException(),
         };
     }
 }
