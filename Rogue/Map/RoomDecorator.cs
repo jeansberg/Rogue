@@ -4,6 +4,7 @@ using Rogue.GameObjects;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using Point = Core.Point;
 
 namespace Rogue.Map {
@@ -35,15 +36,16 @@ namespace Rogue.Map {
             var table = new Table(midPoint);
             var chairLeft = new Chair(midPoint.Left());
             var chairRight = new Chair(midPoint.Right());
-            var weapon = SpawnWeapon(new Point(room.Bounds.X, room.Bounds.Bottom - 1), level, rnd);
 
-            return new List<GameObject> { table, chairLeft, chairRight, weapon };
+            return new List<GameObject> { table, chairLeft, chairRight };
         }
 
         private List<GameObject> GetDecorationsMediumRoom(Room room, int level, Random rnd) {
             var topLeftCorner = new Core.Point(room.Bounds.X, room.Bounds.Y);
             var chair = new Chair(topLeftCorner);
-            var weapon = SpawnWeapon(new Point(room.Bounds.X, room.Bounds.Bottom - 1), level, rnd);
+
+            var emptyPoint = room.GetRandomEmptyPoint(new List<Point> { chair.Location }, rnd);
+            var weapon = SpawnWeapon(emptyPoint, level, rnd);
 
             return new List<GameObject> { chair, weapon };
         }
