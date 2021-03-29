@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using Core;
@@ -21,14 +20,12 @@ namespace Rogue {
         private int RoomMaxWidth;
         private int RoomMinHeight;
         private int RoomMaxHeight;
-        private readonly int Level;
 
         public Random Rnd { get; }
-        private List<Room> Rooms;
 
         private readonly RoomDecorator RoomDecorator;
 
-        public MapGenerator(RoomDecorator roomDecorator, int width, int height, int roomAttempts, int roomMinWidth, int roomMaxWidth, int roomMinHeight, int roomMaxHeight, int level) {
+        public MapGenerator(RoomDecorator roomDecorator, int width, int height, int roomAttempts, int roomMinWidth, int roomMaxWidth, int roomMinHeight, int roomMaxHeight) {
             Width = width;
             Height = height;
             RoomAttempts = roomAttempts;
@@ -36,16 +33,15 @@ namespace Rogue {
             RoomMaxWidth = roomMaxWidth;
             RoomMinHeight = roomMinHeight;
             RoomMaxHeight = roomMaxHeight;
-            Level = level;
             Rnd = new Random();
             RoomDecorator = roomDecorator;
         }
 
-        public IMap GenerateMap()
+        public IMap GenerateMap(IMap? previousMap = null)
         {
-            var map = new RogueMap(Width, Height);
-
-            PlaceRooms(map);
+            var map = new RogueMap(Width, Height, previousMap);
+            map.Level = previousMap == null ? 1 : previousMap.Level + 1;
+            PlaceRooms(map, previousMap);
 
             var maze = new MazeCarver(map);
 
@@ -59,13 +55,13 @@ namespace Rogue {
         }
 
         private void PlaceMonsters(IMap map) {
-            foreach(var room in Rooms) {
+            foreach(var room in map.Rooms) {
                 SpawnMonster(room, map);
             }
         }
 
         private void SpawnMonster(Room room, IMap map) {
-            var monsterType = GetMonsterType();
+            var monsterType = GetMonsterType(map.Level);
 
             Point location;
             do {
@@ -79,11 +75,11 @@ namespace Rogue {
                 .Add(new Monster(monsterType, location, new RogueSharpFov(map)));
         }
 
-        private MonsterType GetMonsterType() {
+        private MonsterType GetMonsterType(int level) {
             var inLevelRange = new List<MonsterType>();
             foreach(MonsterType type in Enum.GetValues(typeof(MonsterType))) {
                 var range = Monster.DungeonLevelRange(type);
-                if (Level >= range.MinLevel && Level <= range.MaxLevel) {
+                if (level >= range.MinLevel && level <= range.MaxLevel) {
                     inLevelRange.Add(type);
                 }
             }
@@ -91,10 +87,8 @@ namespace Rogue {
         }
 
         private void DecorateRooms(IMap map) {
-            var decorations = RoomDecorator.GetDecorations(Rooms, Level, Rnd);
+            var decorations = RoomDecorator.GetDecorations(map.Rooms, map.Level, Rnd);
             map.GameObjects.AddRange(decorations);
-
-
         }
 
         private void ConnectRooms(IMap map) {
@@ -106,7 +100,7 @@ namespace Rogue {
             }
 
             var roomsToDelete = new List<Room>();
-            foreach (var room in Rooms) {
+            foreach (var room in map.Rooms) {
                 var bounds = room.Bounds;
                 var connectors = bounds.Points()
                     .SelectMany(p => map.GetAdjacent(p.ToPoint()))
@@ -146,7 +140,7 @@ namespace Rogue {
                     });
                 }
             }
-            Rooms.RemoveAll(r => roomsToDelete.Contains(r));
+            map.Rooms.RemoveAll(r => roomsToDelete.Contains(r));
         }
 
         private static Func<ICell, bool> HasDoor(IMap map) {
@@ -185,22 +179,63 @@ namespace Rogue {
             return false;
         }
 
-        private void PlaceRooms(IMap map)
+        private void PlaceRooms(IMap map, IMap? previousMap)
         {
-            Rooms = new List<Room>();
+            CreateEntranceAndExit(map, previousMap);
 
             for (int i = 0; i < RoomAttempts; i++) {
-                var width = GetOddNumber(RoomMinWidth, RoomMaxWidth);
-                var height = GetOddNumber(RoomMinHeight, RoomMaxHeight);
-                int xPos = GetOddNumber(1, Width - width - 2);
-                var yPos = GetOddNumber(1, Height - height - 2);
-
-                Rectangle newRoom = new Rectangle(xPos, yPos, width, height);
-                if (!OverLapsRoom(newRoom)) {
-                    PlaceRoom(map, newRoom);
-                    Rooms.Add(new Room(newRoom));
-                }
+                CreateRoom(map, false, false);
             }
+        }
+
+        private Room? CreateRoom(IMap map, bool isEntrance, bool isExit) {
+            var width = GetOddNumber(RoomMinWidth, RoomMaxWidth);
+            var height = GetOddNumber(RoomMinHeight, RoomMaxHeight);
+            int xPos = GetOddNumber(1, Width - width - 2);
+            var yPos = GetOddNumber(1, Height - height - 2);
+
+            var bounds = new Rectangle(xPos, yPos, width, height);
+            if (!OverLapsRoom(bounds, map.Rooms)) {
+                PlaceRoom(map, bounds);
+                var room = new Room(bounds, isEntrance, isExit);
+                map.Rooms.Add(room);
+                return room;
+            }
+
+            return null;
+        }
+
+        private void CreateEntranceAndExit(IMap map, IMap? previousMap) {
+            if (map.Level == 1) {
+                CreateRoom(map, isEntrance: false, isExit: true);
+                CreateExit(map);
+
+            }
+            else if (map.Level == 10) {
+                CreateEntrance(map, previousMap!);
+            }
+            else {
+                CreateEntrance(map, previousMap!);
+                CreateExit(map);
+            }
+        }
+
+        private void CreateExit(IMap map) {
+            Room? exit = null;
+            while (exit == null) {
+                exit = CreateRoom(map, isEntrance: false, isExit: true);
+            }
+
+            var midPoint = map.GetCellAt(exit.Bounds.Center());
+            midPoint.Type = CellType.StairCaseUp;
+        }
+
+        private static void CreateEntrance(IMap map, IMap previousMap) {
+            var previousMapStaircaseDown = previousMap!.Rooms.Single(r => r.HasExit);
+            Room entrance = new Room(previousMapStaircaseDown.Bounds, isEntrance: true, isExit: false);
+            map.Rooms.Add(entrance);
+            var midPoint = map.GetCellAt(entrance.Bounds.Center());
+            midPoint.Type = CellType.StairCaseUp;
         }
 
         private int GetOddNumber(int min, int max) {
@@ -227,9 +262,9 @@ namespace Rogue {
             return number;
         }
 
-        private bool OverLapsRoom(Rectangle newRoom)
+        private bool OverLapsRoom(Rectangle newRoom, List<Room> rooms)
         {
-            foreach(var room in Rooms)
+            foreach(var room in rooms)
             {
                 var bounds = room.Bounds;
                 if (Rectangle.Inflate(newRoom, 4, 4).IntersectsWith(bounds))

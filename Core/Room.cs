@@ -6,11 +6,16 @@ using Point = Core.Point;
 namespace Rogue.Map {
     public class Room {
         public List<Point> DoorLocations { get; set; } = new List<Point>();
-        public Room(Rectangle bounds) {
+
+        public Room(Rectangle bounds, bool isExit, bool isEntrance) {
             Bounds = bounds;
+            HasExit = isExit;
+            HasEntrance = isEntrance;
         }
 
         public Rectangle Bounds { get; private set; }
+        public bool HasExit { get; }
+        public bool HasEntrance { get; }
 
         public List<Direction> GetDoorSides() {
             var sides = new List<Direction>();

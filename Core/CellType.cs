@@ -4,9 +4,9 @@
         RoomFloor,
         Maze,
         Connector,
-        DoorVertical,
-        DoorHorizontal,
         RoomWallVertical,
-        RoomWallHorizontal
+        RoomWallHorizontal,
+        StairCaseDown,
+        StairCaseUp
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Rogue.GameObjects;
+using Rogue.Map;
 using System.Collections.Generic;
 
 namespace Core.Interfaces {
@@ -18,5 +19,7 @@ namespace Core.Interfaces {
         void RemoveGameObject(GameObject gameObject);
         int Width { get; set; }
         int Height { get; set; }
+        int Level { get; set; }
+        List<Room> Rooms { get; set; }
     }
 }

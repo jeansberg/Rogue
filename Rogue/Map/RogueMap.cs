@@ -1,15 +1,16 @@
 ﻿using Core;
 using Core.Interfaces;
 using Rogue.GameObjects;
+using Rogue.Map;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Rogue {
     public class RogueMap : IMap {
         private List<ICell> cells;
-        public RogueMap(int width, int height) {
+        public RogueMap(int width, int height, IMap? previousMap) {
             Width = width;
             Height = height;
+            PreviousMap = previousMap;
             cells = new List<ICell>();
             for (var y = 0; y < height; y++) {
                 for (var x = 0; x < width; x++) {
@@ -19,6 +20,7 @@ namespace Rogue {
 
             GameObjects = new List<GameObject>();
             Actors = new List<Actor>();
+            Rooms = new List<Room>();
         }
 
         public List<Actor> Actors { get; set; }
@@ -34,6 +36,7 @@ namespace Rogue {
         }
 
         public int Height { get; set; }
+        public IMap? PreviousMap { get; }
 
         public bool IsDiscovered(Point point) {
             return GetCellAt(point).IsDiscovered;
@@ -69,6 +72,9 @@ namespace Rogue {
         }
 
         public int Width { get; set; }
+        public int Level { get; set; }
+
+        public List<Room> Rooms { get; set; }
     }
 }
 

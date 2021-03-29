@@ -1,4 +1,5 @@
-﻿using Core.Interfaces;
+﻿using Core.GameObjects;
+using Core.Interfaces;
 using Rogue.Components;
 using Rogue.Consoles;
 using Rogue.GameObjects;
@@ -27,12 +28,12 @@ namespace Rogue {
         }
 
         private static void StartGame() {
-            var generator = new MapGenerator(new Map.RoomDecorator(), Width, Height, 100, 3, 9, 3, 9, 1);
+            var generator = new MapGenerator(new Map.RoomDecorator(), Width, Height, 100, 3, 9, 3, 9);
 
             map = generator.GenerateMap();
 
             player = new Player(new Point(0, 0), new RogueSharpFov(map));
-
+            player.Inventory.Add(new Weapon(new Point(0, 0), WeaponType.Mace));
             actors = new List<Actor> {
                 player,
             };

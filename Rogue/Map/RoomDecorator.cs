@@ -12,7 +12,7 @@ namespace Rogue.Map {
         public List<GameObject> GetDecorations(List<Room> rooms, int level, Random rnd) {
             var decorations = new List<GameObject>();
             
-            foreach(var room in rooms) {
+            foreach(var room in rooms.Where(r => !r.HasEntrance && !r.HasExit)) {
                 if (rnd.Next(2) == 1){
                     continue;
                 }

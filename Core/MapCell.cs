@@ -19,10 +19,10 @@ namespace Core {
                  CellType.RoomFloor => Color.Gray,
                  CellType.Maze => Color.Gray,
                  CellType.Connector => Color.Gray,
-                 CellType.DoorVertical => Color.SaddleBrown,
-                 CellType.DoorHorizontal => Color.SaddleBrown,
                  CellType.RoomWallVertical => Color.Gray,
                  CellType.RoomWallHorizontal => Color.Gray,
+                 CellType.StairCaseDown => Color.DarkGray,
+                 CellType.StairCaseUp => Color.LightGray,
                  _ => throw new NotImplementedException()
              };
 
@@ -33,8 +33,8 @@ namespace Core {
             CellType.Connector => 120,
             CellType.RoomWallVertical => 186,
             CellType.RoomWallHorizontal => 205,
-
-
+            CellType.StairCaseDown => 240,
+            CellType.StairCaseUp => 240,
             _ => throw new NotImplementedException()
         };
 
