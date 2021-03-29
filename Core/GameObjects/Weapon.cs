@@ -20,7 +20,7 @@ namespace Core.GameObjects {
             _ => throw new System.NotImplementedException(),
         };
 
-        public override Color Color() => System.Drawing.Color.AliceBlue;
+        public override Color Color() => System.Drawing.Color.LightSteelBlue;
 
         public override string Name() => WeaponType switch {
             WeaponType.Mace => "Mace",
