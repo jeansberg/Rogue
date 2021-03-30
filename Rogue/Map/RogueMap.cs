@@ -3,6 +3,8 @@ using Core.Interfaces;
 using Rogue.GameObjects;
 using Rogue.Map;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace Rogue {
     public class RogueMap : IMap {
@@ -75,6 +77,34 @@ namespace Rogue {
         public int Level { get; set; }
 
         public List<Room> Rooms { get; set; }
+
+        public override string ToString() {
+            var builder = new StringBuilder();
+            for (var y = 0; y < Height; y++) {
+                for (var x = 0; x < Width; x++){
+                    var cell = GetCellAt(new Point(x, y));
+                    var cellCharacter = cell.Type switch {
+                        CellType.Wall => "#",
+                        CellType.RoomFloor => ".",
+                        CellType.Maze => ".",
+                        CellType.Connector => "X",
+                        CellType.RoomWallVertical => "|",
+                        CellType.RoomWallHorizontal => "-",
+                        CellType.StairCaseDown => ">",
+                        CellType.StairCaseUp => "<",
+                        _ => throw new System.NotImplementedException(),
+                    };
+
+                    var gameObjectCharacter = GameObjects.SingleOrDefault(g => g is Door && g.Location == new Point(x, y));
+
+                    builder.Append(gameObjectCharacter == null ? cellCharacter : "X");
+                    if (x == Width - 1)
+                        builder.AppendLine();
+                }
+            }
+
+            return builder.ToString();
+        }
     }
 }
 

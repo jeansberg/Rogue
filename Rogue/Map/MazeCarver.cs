@@ -16,7 +16,7 @@ namespace Rogue.MazeGenerator {
             this.map = map;
         }
 
-        public void CarveMaze(Point point, Direction direction) {
+        public void CarveMaze(Point point) {
             visitedPoints.Add(point);
             map.SetWalkable(point, true);
             map.SetTransparent(point, true);
@@ -29,56 +29,60 @@ namespace Rogue.MazeGenerator {
             foreach (var dir in directions) {
                 var nextPoint = point.Increment(dir);
                 if (IsValid(nextPoint, dir)) {
-                    CarveMaze(nextPoint, dir);
+                    CarveMaze(nextPoint);
                 }
             }
         }
 
-        private bool IsValid(Point nextPoint, Direction dir) {
-            if (visitedPoints.Contains(nextPoint)) {
+        private bool IsValid(Point point, Direction dir) {
+            if (!map.InBounds(point)) {
+                return false;
+            }
+            
+            if (map.GetCellAt(point).Type != CellType.Wall) {
                 return false;
             }
 
-            if (!map.InBounds(nextPoint)) {
+            if (visitedPoints.Contains(point)) {
                 return false;
             }
 
-            var nextNext = nextPoint.Increment(dir);
+            //var point = point.Increment(dir);
 
             // Don't break walls between corridors
             var adjacent = (dir switch {
                 Direction.Up =>
                         // Check E, W, N
                         new List<Point> {
-                            nextNext.Right(),
-                            nextNext.Left(),
-                            nextNext.Up()
+                            point.Right(),
+                            point.Left(),
+                            point.Up()
                         },
                 Direction.Down =>
                         // Check E, W, S
                         new List<Point> {
-                            nextNext.Right(),
-                            nextNext.Left(),
-                            nextNext.Down()
+                            point.Right(),
+                            point.Left(),
+                            point.Down()
                         },
                 Direction.Right=>
                         // Check N, E, S
                         new List<Point> {
-                            nextNext.Up(),
-                            nextNext.Right(),
-                            nextNext.Down()
+                            point.Up(),
+                            point.Right(),
+                            point.Down()
                         },
                 Direction.Left=>
                         // Check W, N, S
                         new List<Point> {
-                            nextNext.Left(),
-                            nextNext.Up(),
-                            nextNext.Down(),
+                            point.Left(),
+                            point.Up(),
+                            point.Down(),
                         },
                 _ => throw new NotImplementedException()
             }).Where(a => map.InBounds(a));
 
-            if (adjacent.Any(x => map.GetCellAt(x).IsWalkable)) {
+            if (adjacent.Any(x => map.GetCellAt(x).Type == CellType.Maze || map.GetCellAt(x).Type == CellType.RoomFloor)) {
                 return false;
             }
 

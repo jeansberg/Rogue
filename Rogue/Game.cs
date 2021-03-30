@@ -1,13 +1,21 @@
 ﻿using Core.Interfaces;
-using Rogue.GameObjects;
 using System.Collections.Generic;
 
 namespace Rogue {
-    /// <summary>
-    /// Contains the game state
-    /// </summary>
     public class Game {
-        private IMap map;
-        private List<GameObject> gameObjects;
+        private List<IMap> maps;
+        public IMap Map { get; private set; }
+        public Game(List<IMap> maps) {
+            this.maps = maps;
+            Map = maps[0];
+        }
+
+        public void Descend() {
+            Map = maps[Map.Level];
+        }
+
+        public void Ascend() {
+            Map = maps[Map.Level - 2];
+        }
     }
 }

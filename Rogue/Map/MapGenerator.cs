@@ -45,7 +45,7 @@ namespace Rogue {
 
             var maze = new MazeCarver(map);
 
-            maze.CarveMaze(new Point(0, 0), Direction.Up);
+            maze.CarveMaze(new Point(0, 0));
 
             ConnectRooms(map);
             DecorateRooms(map);
@@ -77,7 +77,7 @@ namespace Rogue {
 
         private MonsterType GetMonsterType(int level) {
             var inLevelRange = new List<MonsterType>();
-            foreach(MonsterType type in Enum.GetValues(typeof(MonsterType))) {
+            foreach (MonsterType type in Enum.GetValues(typeof(MonsterType))) {
                 var range = Monster.DungeonLevelRange(type);
                 if (level >= range.MinLevel && level <= range.MaxLevel) {
                     inLevelRange.Add(type);
@@ -191,8 +191,8 @@ namespace Rogue {
         private Room? CreateRoom(IMap map, bool isEntrance, bool isExit) {
             var width = GetOddNumber(RoomMinWidth, RoomMaxWidth);
             var height = GetOddNumber(RoomMinHeight, RoomMaxHeight);
-            int xPos = GetOddNumber(1, Width - width - 2);
-            var yPos = GetOddNumber(1, Height - height - 2);
+            int xPos = GetOddNumber(3, Width - width - 2);
+            var yPos = GetOddNumber(3, Height - height - 2);
 
             var bounds = new Rectangle(xPos, yPos, width, height);
             if (!OverLapsRoom(bounds, map.Rooms)) {
@@ -207,7 +207,6 @@ namespace Rogue {
 
         private void CreateEntranceAndExit(IMap map, IMap? previousMap) {
             if (map.Level == 1) {
-                CreateRoom(map, isEntrance: false, isExit: true);
                 CreateExit(map);
 
             }
@@ -227,12 +226,13 @@ namespace Rogue {
             }
 
             var midPoint = map.GetCellAt(exit.Bounds.Center());
-            midPoint.Type = CellType.StairCaseUp;
+            midPoint.Type = CellType.StairCaseDown;
         }
 
-        private static void CreateEntrance(IMap map, IMap previousMap) {
-            var previousMapStaircaseDown = previousMap!.Rooms.Single(r => r.HasExit);
+        private void CreateEntrance(IMap map, IMap previousMap) {
+            var previousMapStaircaseDown = previousMap!.Rooms.Single(r => r.IsExit);
             Room entrance = new Room(previousMapStaircaseDown.Bounds, isEntrance: true, isExit: false);
+            PlaceRoom(map, entrance.Bounds);
             map.Rooms.Add(entrance);
             var midPoint = map.GetCellAt(entrance.Bounds.Center());
             midPoint.Type = CellType.StairCaseUp;

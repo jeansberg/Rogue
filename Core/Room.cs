@@ -7,15 +7,15 @@ namespace Rogue.Map {
     public class Room {
         public List<Point> DoorLocations { get; set; } = new List<Point>();
 
-        public Room(Rectangle bounds, bool isExit, bool isEntrance) {
+        public Room(Rectangle bounds, bool isEntrance, bool isExit) {
             Bounds = bounds;
-            HasExit = isExit;
-            HasEntrance = isEntrance;
+            IsExit = isExit;
+            IsEntrance = isEntrance;
         }
 
         public Rectangle Bounds { get; private set; }
-        public bool HasExit { get; }
-        public bool HasEntrance { get; }
+        public bool IsExit { get; }
+        public bool IsEntrance { get; }
 
         public List<Direction> GetDoorSides() {
             var sides = new List<Direction>();
