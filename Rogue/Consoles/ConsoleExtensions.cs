@@ -9,15 +9,27 @@ using Point = Core.Point;
 
 namespace Rogue.Consoles {
     public static class ConsoleExtensions {
-        public static void Draw(this Console console, ICell cell, Visibility visibility) {
+        public static void Draw(this Console console, ICell cell, Visibility visibility, bool showExits) {
             if (visibility == Visibility.Hidden) {
                 console.Cursor.RightWrap(1);
                 return;
             }
 
-            var foreground = visibility == Visibility.InFov ? cell.Color.ToSadColor() : cell.Color.ToSadColor().GetDarker();
+            Color foreground;
+            int glyphId;
+            if (cell.Type == Core.CellType.StairCaseUp) {
+                foreground = Color.Gray;
+                glyphId = 46;
+            }
+            else {
+                foreground = cell.Color.ToSadColor();
+                glyphId = cell.GlyphId;
+            }
+
+            foreground = visibility == Visibility.InFov ? foreground : foreground.GetDarker();
             console.Cursor.Position = new Point(cell.Location.X, cell.Location.Y).ToSadPoint();
-            Draw(console, foreground, cell.GlyphId);
+
+            Draw(console, foreground, glyphId);
         }
 
         public static void Draw(this Console console, GameObject gameObject, Visibility visibility) {

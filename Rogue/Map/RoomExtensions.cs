@@ -14,7 +14,7 @@ namespace Rogue.Map {
         }
 
         public static Point MidBottom(this Room room) {
-            return new Point(room.Bounds.Center().X, room.Bounds.Bottom);
+            return new Point(room.Bounds.Center().X, room.Bounds.Bottom - 1);
         }
 
         public static Point MidRight(this Room room) {

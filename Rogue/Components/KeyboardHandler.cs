@@ -20,20 +20,21 @@ namespace Rogue.Components {
         private readonly LogConsole logConsole;
         private Player player;
         private readonly InventoryConsole inventory;
-        private List<Actor> actors;
+        private readonly Game game;
+        private List<Actor> actors { get { return game.Map.Actors; } }
         private readonly Action startGame;
         private List<Action> actions;
         private Timer turnTimer;
         private List<Point> trajectory;
         private bool playerMoved;
 
-        public KeyboardHandler(MapConsole mapConsole, LogConsole logConsole, MessageConsole messageConsole, Player player, InventoryConsole inventory, List<Actor> actors, Action startGame) {
+        public KeyboardHandler(MapConsole mapConsole, LogConsole logConsole, MessageConsole messageConsole, Player player, InventoryConsole inventory, Game game, Action startGame) {
             this.mapConsole = mapConsole;
             this.logConsole = logConsole;
             this.messageConsole = messageConsole;
             this.player = player;
             this.inventory = inventory;
-            this.actors = actors;
+            this.game = game;
             this.startGame = startGame;
             state = InputState.Idle;
             mapConsole.IsFocused = true;

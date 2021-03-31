@@ -14,17 +14,14 @@ namespace Rogue.Consoles {
         private readonly LogConsole logConsole;
         private readonly MessageConsole messageConsole;
         private readonly InventoryConsole inventory;
-        private readonly List<Actor> actors;
-        private readonly Actor player;
         private readonly KeyboardHandler keyboardHandlerObject;
 
-        public MainConsole(MapConsole mapConsole, LogConsole logConsole, MessageConsole messageConsole, KeyboardHandler keyboardHandler, InventoryConsole inventory, List<Actor> actors) : base(80, 40) {
+        public MainConsole(MapConsole mapConsole, LogConsole logConsole, MessageConsole messageConsole, KeyboardHandler keyboardHandler, InventoryConsole inventory) : base(80, 40) {
             this.mapConsole = mapConsole;
             this.logConsole = logConsole;
             this.messageConsole = messageConsole;
             this.inventory = inventory;
-            this.actors = actors;
-            player = actors.Single(a => a is Player);
+
 
             this.Font = new Font(12, 12, 0, 16, 16, 0, new GameTexture(new SFML.Graphics.Texture("../../../Cheepicus_12x12.png")), "mapFont");
 
@@ -37,7 +34,7 @@ namespace Rogue.Consoles {
         }
 
         public override void Update(TimeSpan delta) {
-            mapConsole.Update(this.actors, delta);
+            mapConsole.Update(delta);
             messageConsole.Update(delta);
             logConsole.Update(delta);
             inventory.Update(delta);

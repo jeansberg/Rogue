@@ -86,7 +86,7 @@ namespace Rogue.Map {
                 return WeaponType.Mace;
             }
             else {
-                var type = rnd.Next(1, 4);
+                var type = rnd.Next(0, 3);
                 return (WeaponType)type;
             }
         }

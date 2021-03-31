@@ -16,6 +16,7 @@ namespace Rogue {
     {
         private const int Width = 60;
         private const int Height = 40;
+        private static Game game;
         private static IMap map;
 
         static void Main(string[] args) {
@@ -29,7 +30,7 @@ namespace Rogue {
             var generator = new MapGenerator(new Map.RoomDecorator(), Width, Height, 100, 3, 9, 3, 9);
 
             var maps = new List<IMap>();
-            for(var level = 1; level < 11; level++) {
+            for (var level = 1; level < 11; level++) {
                 if (level == 1) {
                     var map = generator.GenerateMap();
                     maps.Add(map);
@@ -40,10 +41,10 @@ namespace Rogue {
                 }
             }
 
-            var game = new Game(maps);
+            game = new Game(maps);
             map = game.Map;
-            var player = new Player(new Point(0, 0), new RogueSharpFov(map));
-            player.Inventory.Add(new Weapon(new Point(0, 0), WeaponType.Mace));
+
+            var player = GetPlayer();
             map.Actors.Add(player);
 
             if (SadConsole.Game.Instance == null) {
@@ -59,18 +60,24 @@ namespace Rogue {
             SadConsole.Game.Instance.Dispose();
         }
 
+        private static Player GetPlayer() {
+            var player = new Player(new Point(0, 0), new RogueSharpFov(map));
+            player.Inventory.Add(new Weapon(new Point(0, 0), WeaponType.Mace));
+            return player;
+        }
+
         private static void Init() {
             // Any startup code for your game. We will use an example console for now
-            var mapConsole = new MapConsole(map, true, new AStarPathFinder());
+            var mapConsole = new MapConsole(game, true, new AStarPathFinder());
             var logConsole = new LogConsole();
             var messageConsole = new MessageConsole();
 
             var player = map.Actors.Single(a => a is Player) as Player;
             var inventory = new InventoryConsole(player);
 
-            var keyboardHandler = new KeyboardHandler(mapConsole, logConsole, messageConsole, player, inventory, map.Actors, () => StartGame());
+            var keyboardHandler = new KeyboardHandler(mapConsole, logConsole, messageConsole, player, inventory, game, () => StartGame());
 
-            var mainConsole = new MainConsole(mapConsole, logConsole, messageConsole, keyboardHandler, inventory, map.Actors);
+            var mainConsole = new MainConsole(mapConsole, logConsole, messageConsole, keyboardHandler, inventory);
 
             mainConsole.Children.Add(mapConsole);
             mainConsole.Children.Add(logConsole);

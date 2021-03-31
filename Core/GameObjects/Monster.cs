@@ -39,7 +39,15 @@ namespace Rogue.GameObjects {
             _ => throw new NotImplementedException(),
         };
 
-        public override Color Color() => System.Drawing.Color.Green;
+        public override Color Color() => MonsterType switch {
+            MonsterType.Bat => System.Drawing.Color.Gray,
+            MonsterType.Hobgoblin => System.Drawing.Color.Green,
+            MonsterType.Orc => System.Drawing.Color.Green,
+            MonsterType.Kestrel => System.Drawing.Color.SaddleBrown,
+            MonsterType.IceMonster => System.Drawing.Color.LightBlue,
+            MonsterType.Snake => System.Drawing.Color.Gray,
+            _ => throw new NotImplementedException(),
+        };
 
         public override string Name() => MonsterType switch {
             MonsterType.Hobgoblin => "Hobgoblin",
@@ -68,6 +76,7 @@ namespace Rogue.GameObjects {
             MonsterType.Kestrel => 1,
             MonsterType.IceMonster => 15,
             MonsterType.Snake => 1,
+            _ => throw new NotImplementedException(),
         };
     }
 }
