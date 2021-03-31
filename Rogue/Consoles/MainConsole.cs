@@ -13,13 +13,15 @@ namespace Rogue.Consoles {
         private readonly MapConsole mapConsole;
         private readonly LogConsole logConsole;
         private readonly MessageConsole messageConsole;
+        private readonly StatusConsole statusConsole;
         private readonly InventoryConsole inventory;
         private readonly KeyboardHandler keyboardHandlerObject;
 
-        public MainConsole(MapConsole mapConsole, LogConsole logConsole, MessageConsole messageConsole, KeyboardHandler keyboardHandler, InventoryConsole inventory) : base(80, 40) {
+        public MainConsole(MapConsole mapConsole, LogConsole logConsole, MessageConsole messageConsole, StatusConsole statusConsole, KeyboardHandler keyboardHandler, InventoryConsole inventory) : base(80, 40) {
             this.mapConsole = mapConsole;
             this.logConsole = logConsole;
             this.messageConsole = messageConsole;
+            this.statusConsole = statusConsole;
             this.inventory = inventory;
 
 
@@ -37,6 +39,7 @@ namespace Rogue.Consoles {
             mapConsole.Update(delta);
             messageConsole.Update(delta);
             logConsole.Update(delta);
+            statusConsole.Update(delta);
             inventory.Update(delta);
 
             keyboardHandlerObject.Update(this, delta);

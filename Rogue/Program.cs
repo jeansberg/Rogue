@@ -67,21 +67,23 @@ namespace Rogue {
         }
 
         private static void Init() {
-            // Any startup code for your game. We will use an example console for now
+            var player = map.Actors.Single(a => a is Player) as Player;
+
             var mapConsole = new MapConsole(game, true, new AStarPathFinder());
             var logConsole = new LogConsole();
             var messageConsole = new MessageConsole();
+            var statusConsole = new StatusConsole(player);
 
-            var player = map.Actors.Single(a => a is Player) as Player;
             var inventory = new InventoryConsole(player);
 
             var keyboardHandler = new KeyboardHandler(mapConsole, logConsole, messageConsole, player, inventory, game, () => StartGame());
 
-            var mainConsole = new MainConsole(mapConsole, logConsole, messageConsole, keyboardHandler, inventory);
+            var mainConsole = new MainConsole(mapConsole, logConsole, messageConsole, statusConsole, keyboardHandler, inventory);
 
             mainConsole.Children.Add(mapConsole);
             mainConsole.Children.Add(logConsole);
             mainConsole.Children.Add(messageConsole);
+            mainConsole.Children.Add(statusConsole);
             mainConsole.Children.Add(inventory);
 
             SadConsole.Game.Instance.Screen = mainConsole;
