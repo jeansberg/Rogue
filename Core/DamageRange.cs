@@ -39,7 +39,7 @@ namespace Rogue {
                 _ => diceRoller.RollDice(1, 2),
             };
 
-            return weaponDamage * (1 + p.Level / 10);
+            return weaponDamage * (1 + p.Level.number / 10);
         }
     }
 }

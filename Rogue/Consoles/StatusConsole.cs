@@ -21,7 +21,6 @@ namespace Rogue.Consoles {
             PrintHealth();
             PrintLevel();
 
-            Cursor.Position = new SadRogue.Primitives.Point(20, 0);
             PrintWeapon();
             PrintArmor();
 
@@ -29,8 +28,12 @@ namespace Rogue.Consoles {
         }
 
         private void PrintLevel() {
-            Cursor.Print($"Level:  {player.Level}");
+            Cursor.Print(player.Level.name);
             Cursor.NewLine();
+            Cursor.Print(player.Experience.ToString());
+            if (!player.IsMaxLevel()) {
+                Cursor.Print($" / {player.GetXpRequirementNextLevel()}");
+            }
         }
 
         private void PrintHealth() {
@@ -39,11 +42,13 @@ namespace Rogue.Consoles {
         }
 
         private void PrintWeapon() {
+            Cursor.Position = new SadRogue.Primitives.Point(20, 0);
             Cursor.Print($"Weapon: {player.Weapon?.Name()}");
             Cursor.NewLine();
         }
 
         private void PrintArmor() {
+            Cursor.Position = new SadRogue.Primitives.Point(20, 1);
             Cursor.Print($"Armor: ");
             Cursor.NewLine();
         }
