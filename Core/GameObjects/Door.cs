@@ -37,5 +37,8 @@ namespace Rogue.GameObjects {
         public override string Name() {
             return "Door";
         }
+
+        public override void Update() {
+        }
     }
 }

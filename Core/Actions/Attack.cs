@@ -16,7 +16,7 @@ namespace Rogue.Actions {
             target.Health -= damage;
 
             if (!target.IsAlive && actor is Player p) {
-                p.Experience += Monster.ExperienceReward(((Monster)target).MonsterType);
+                p.SetExperience(p.GetExperience() + Monster.ExperienceReward(((Monster)target).MonsterType));
             }
 
             Locator.Audio.PlaySound("hit");

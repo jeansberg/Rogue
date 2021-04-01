@@ -6,6 +6,8 @@ using System.Collections.Generic;
 namespace Rogue.GameObjects {
     public abstract class Actor : GameObject {
         public int Health { get; set; }
+        public int MaxHealth { get; set; }
+
         public bool IsAlive => Health > 0;
         public IFov Fov { get; set; }
         public List<GameObject> Inventory { get; set; }
@@ -16,7 +18,8 @@ namespace Rogue.GameObjects {
 
         public Actor(Point location, int health, IFov fov) :
             base(location) {
-            Health = health;
+            MaxHealth = health;
+            Health = MaxHealth;
             Fov = fov;
 
             Inventory = new List<GameObject>();

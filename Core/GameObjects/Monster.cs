@@ -11,6 +11,9 @@ namespace Rogue.GameObjects {
             MonsterType = type;
         }
 
+        public override void Update() {
+        }
+
         private static int GetStartingHealth(MonsterType type) {
             int hitDice = type switch {
                 MonsterType.Bat => 1,

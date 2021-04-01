@@ -8,6 +8,8 @@ namespace Rogue.GameObjects {
             Location = location;
         }
 
+        public abstract void Update();
+
         public abstract Color Color();
         public abstract int GlyphId();
         public abstract string Name();

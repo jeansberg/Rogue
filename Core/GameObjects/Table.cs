@@ -22,6 +22,9 @@ namespace Rogue.GameObjects {
 
         public override string Name() {
             return "Table";        }
+
+        public override void Update() {
+        }
     }
 }
 

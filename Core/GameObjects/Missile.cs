@@ -27,5 +27,8 @@ namespace Rogue.GameObjects {
         public override string Name() {
             return "Missile";
         }
+
+        public override void Update() {
+        }
     }
 }

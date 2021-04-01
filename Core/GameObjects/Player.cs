@@ -1,35 +1,62 @@
 ﻿using Core;
 using Core.GameObjects;
 using Core.Interfaces;
+using Rogue.Services;
 using System;
 using Color = System.Drawing.Color;
 
 namespace Rogue.GameObjects {
     public class Player : Actor {
         private readonly string name;
-        public int Experience { get; set; }
-        public (int number, string name) Level { get {
-                if (Experience < 50) {
-                    return (1, "Guild Novice");
+        private int StepCount;
+        private int experience;
+
+        public (int number, int maxHealth, string name) Level { get {
+                if (GetExperience() < 50) {
+                    return (1, 10, "Guild Novice");
                 }
-                else if (Experience < 150) {
-                    return (2, "Apprentice");
+                else if (GetExperience() < 150) {
+                    return (2, 15, "Apprentice");
                 }
-                else if (Experience < 450) {
-                    return (3, "Journeyman");
+                else if (GetExperience() < 450) {
+                    return (3, 20, "Journeyman");
                 }
-                else if (Experience < 1350) {
-                    return (4, "Adventurer");
+                else if (GetExperience() < 1350) {
+                    return (4, 25, "Adventurer");
                 }
                 else {
-                    return (5, "Fighter");
+                    return (5, 30, "Fighter");
                 }
 
             }}
 
         public Player(Point location, IFov fov, string name = "Player") : base(location, 10, fov) {
             this.name = name;
-            Experience = 0;
+            SetExperience(0);
+        }
+
+        public override void Update() {
+            StepCount++;
+
+            if (StepCount == 21 - (Level.number * 2)) {
+                RegenerateHealth();
+                StepCount = 0;
+            }
+        }
+
+        private void RegenerateHealth() {
+            Health = Health < MaxHealth ? Health + 1 : Health;
+        }
+
+        public int GetExperience() { return experience; }
+        public void SetExperience(int value) {
+            var oldLevel = Level;
+            experience = value;
+            if (Level.number > oldLevel.number) {
+                MaxHealth = Level.maxHealth;
+                Health = MaxHealth;
+                Locator.Audio.PlaySound("levelUp");
+            }
         }
 
         public bool IsMaxLevel() {

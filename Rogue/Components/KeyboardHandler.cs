@@ -127,7 +127,7 @@ namespace Rogue.Components {
             }
 
             if (playerMoved) {
-                UpdateActors();
+                ActivateActors();
             }
 
             handled = true;
@@ -230,12 +230,13 @@ namespace Rogue.Components {
             missile.Moving = missile.Moving && keepMoving;
 
             if (!missile.Moving) {
-                UpdateActors();
+                ActivateActors();
             }
         }
 
-        private void UpdateActors() {
+        private void ActivateActors() {
             actors.RemoveAll(a => !a.IsAlive);
+            actors.ForEach(a => a.Update());
 
             foreach (var actor in actors.Where(a => a != player)) {
                 actor.Fov.ComputeFov(actor.Location.X, actor.Location.Y, 5, true);

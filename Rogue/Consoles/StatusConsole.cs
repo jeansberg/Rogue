@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
 using Rogue.GameObjects;
 using SadConsole;
-using Utilities.SadConsole;
 
 namespace Rogue.Consoles {
     public class StatusConsole : SadConsole.Console {
@@ -30,7 +27,7 @@ namespace Rogue.Consoles {
         private void PrintLevel() {
             Cursor.Print(player.Level.name);
             Cursor.NewLine();
-            Cursor.Print(player.Experience.ToString());
+            Cursor.Print(player.GetExperience().ToString());
             if (!player.IsMaxLevel()) {
                 Cursor.Print($" / {player.GetXpRequirementNextLevel()}");
             }

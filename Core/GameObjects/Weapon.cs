@@ -32,5 +32,8 @@ namespace Core.GameObjects {
         public override IAction GetAction(IMap map, Direction from) {
             return new PickUp(this, map);
         }
+
+        public override void Update() {
+        }
     }
 }

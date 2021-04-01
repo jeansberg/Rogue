@@ -22,6 +22,9 @@ namespace Rogue.GameObjects {
         public override string Name() {
             return "Chair";
         }
-    };
+
+        public override void Update() {
+        }
+    }
 }
 
