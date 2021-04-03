@@ -82,13 +82,13 @@ namespace Rogue.Map {
         }
 
         private WeaponType GetWeaponType(int level, Random rnd) {
-            if (level == 1) {
-                return WeaponType.Mace;
+            var inLevelRange = new List<WeaponType>();
+            foreach (WeaponType type in Enum.GetValues(typeof(WeaponType))) {
+                if (Weapon.DungeonLevelMin(type) <= level) {
+                    inLevelRange.Add(type);
+                }
             }
-            else {
-                var type = rnd.Next(0, 3);
-                return (WeaponType)type;
-            }
+            return inLevelRange[rnd.Next(0, inLevelRange.Count)];
         }
     }
 }

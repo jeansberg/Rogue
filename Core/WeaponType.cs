@@ -1,7 +1,19 @@
 ﻿namespace Rogue {
     public enum WeaponType {
-        Mace,
-        LongSword,
         Arrow,
+        Crossbow,
+        CrossbowBolt,
+        Dagger,
+        Dart,
+        Longsword,
+        Mace,
+        Rock,
+        Shortbow,
+        Sling,
+        Shuriken,
+        Spear,
+        TwoHandedSword,
+        Staff,
+        Wand
     }
 }

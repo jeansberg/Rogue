@@ -32,14 +32,31 @@ namespace Rogue {
 
         private int CalculatePlayerDamage(Player p, Missile? missile) {
             var diceRoller = Locator.Dice;
-            var weaponDamage = p.Weapon?.WeaponType switch {
-                WeaponType.Mace => missile != null ? diceRoller.RollDice(1, 3) : diceRoller.RollDice(2, 4),
-                WeaponType.LongSword => missile != null ? diceRoller.RollDice(1, 2) : diceRoller.RollDice(3, 4),
-                WeaponType.Arrow => missile != null ? diceRoller.RollDice(2, 3) : diceRoller.RollDice(1, 1),
-                _ => diceRoller.RollDice(1, 2),
+            (int rangedDamage, int meleeDamage) = p.Weapon?.WeaponType switch {
+                WeaponType.Mace => (diceRoller.RollDice(1, 3), diceRoller.RollDice(2, 4)),
+                WeaponType.Longsword => (diceRoller.RollDice(1, 2), diceRoller.RollDice(3, 4)),
+                WeaponType.Arrow => (diceRoller.RollDice(2, 3), diceRoller.RollDice(1, 1)),
+                WeaponType.Crossbow => (diceRoller.RollDice(1, 1), diceRoller.RollDice(1, 1)),
+                WeaponType.CrossbowBolt => (diceRoller.RollDice(1, 2), diceRoller.RollDice(1, 10)),
+                WeaponType.Dagger => (diceRoller.RollDice(1, 6), diceRoller.RollDice(1, 4)),
+                WeaponType.Dart => (diceRoller.RollDice(1, 1), diceRoller.RollDice(1, 3)),
+                WeaponType.Rock => (diceRoller.RollDice(1, 2), diceRoller.RollDice(1, 4)),
+                WeaponType.Shortbow => (diceRoller.RollDice(1, 1), diceRoller.RollDice(1, 1)),
+                WeaponType.Sling => (diceRoller.RollDice(0, 0), diceRoller.RollDice(0, 0)),
+                WeaponType.Shuriken => (diceRoller.RollDice(1, 2), diceRoller.RollDice(2, 4)),
+                WeaponType.Spear => (diceRoller.RollDice(1, 8), diceRoller.RollDice(1, 6)),
+                WeaponType.TwoHandedSword => (diceRoller.RollDice(4, 4), diceRoller.RollDice(1, 2)),
+                WeaponType.Staff => (diceRoller.RollDice(2, 3), diceRoller.RollDice(1, 1)),
+                WeaponType.Wand => (diceRoller.RollDice(1, 1), diceRoller.RollDice(1, 1)),
+                _ => (diceRoller.RollDice(0, 0), diceRoller.RollDice(1, 2)),
             };
 
-            return weaponDamage * (1 + p.Level.number / 10);
+            if (missile != null) {
+                return rangedDamage;
+            }
+            else {
+                return meleeDamage;
+            }
         }
     }
 }
