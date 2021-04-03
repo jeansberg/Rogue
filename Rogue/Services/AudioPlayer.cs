@@ -10,8 +10,8 @@ namespace Rogue.Services {
         private WaveOutEvent outputDevice;
         private MixingSampleProvider mixer;
         
-        public AudioPlayer() {
-            rnd = new Random();
+        public AudioPlayer(Random rnd) {
+            this.rnd = rnd;
 
             outputDevice = new WaveOutEvent();
             mixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(48000, 2));

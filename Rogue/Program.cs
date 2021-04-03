@@ -18,16 +18,19 @@ namespace Rogue {
         private const int Height = 40;
         private static Game game;
         private static IMap map;
+        private static Random rnd;
 
         static void Main(string[] args) {
-            Locator.RegisterAudioPlayer(new AudioPlayer());
-            Locator.RegisterDiceRoller(new DiceRoller(new System.Random(DateTime.Now.Millisecond)));
+            rnd = new Random(DateTime.Now.Millisecond);
 
-            StartGame();
+            Locator.RegisterAudioPlayer(new AudioPlayer(rnd));
+            Locator.RegisterDiceRoller(new DiceRoller(rnd));
+
+            StartGame(rnd);
         }
 
-        private static void StartGame() {
-            var generator = new MapGenerator(new Map.RoomDecorator(), Width, Height, 100, 3, 9, 3, 9);
+        private static void StartGame(Random rnd) {
+            var generator = new MapGenerator(rnd, roomDecorator: new Map.RoomDecorator(), width: Width, height: Height, roomAttempts: 100, roomMinWidth: 3, roomMaxWidth: 9, roomMinHeight: 3, roomMaxHeight: 9);
 
             var maps = new List<IMap>();
             for (var level = 1; level < 11; level++) {
@@ -76,7 +79,7 @@ namespace Rogue {
 
             var inventory = new InventoryConsole(player);
 
-            var keyboardHandler = new KeyboardHandler(mapConsole, logConsole, messageConsole, player, inventory, game, () => StartGame());
+            var keyboardHandler = new KeyboardHandler(mapConsole, logConsole, messageConsole, player, inventory, game, () => StartGame(rnd));
 
             var mainConsole = new MainConsole(mapConsole, logConsole, messageConsole, statusConsole, keyboardHandler, inventory);
 

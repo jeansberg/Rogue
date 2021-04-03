@@ -1,4 +1,5 @@
-﻿using Core.Interfaces;
+﻿using Core.GameObjects;
+using Core.Interfaces;
 using Rogue.GameObjects;
 using Rogue.Services;
 
@@ -18,7 +19,7 @@ namespace Rogue.Actions {
                 actor.Inventory.Add(item);
                 map.RemoveGameObject(item);
 
-                if (item.Type == GameObjectType.Weapon) {
+                if (item is Weapon) {
                     Locator.Audio.PlaySound("weaponPickup");
                 }
 

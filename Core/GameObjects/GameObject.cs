@@ -4,7 +4,7 @@ using Color = System.Drawing.Color;
 
 namespace Rogue.GameObjects {
     public abstract class GameObject : IHasAction {
-        public GameObject(Point location, GameObjectType type = GameObjectType.Uncategorized) {
+        public GameObject(Point location) {
             Location = location;
         }
 
@@ -15,7 +15,6 @@ namespace Rogue.GameObjects {
         public abstract string Name();
 
         public Point Location { get; set; }
-        public GameObjectType Type { get; set; }
         public abstract IAction GetAction(IMap map, Direction from);
     }
 }

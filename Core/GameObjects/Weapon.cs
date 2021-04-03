@@ -6,8 +6,8 @@ using System.Drawing;
 
 namespace Core.GameObjects {
     public class Weapon : GameObject {
-        public Weapon(Point location, WeaponType weaponType, GameObjectType type = GameObjectType.Weapon) : 
-            base(location, type) {
+        public Weapon(Point location, WeaponType weaponType) : 
+            base(location) {
             this.WeaponType = weaponType;
         }
 

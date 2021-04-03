@@ -2,18 +2,23 @@
 using Core.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
-
+using Point = Core.Point;
 
 namespace Rogue.MazeGenerator {
 
     public class MazeCarver {
         public readonly IMap map;
+        private readonly Random rnd;
         private List<Point> visitedPoints;
+        private List<(List<Point>, ConsoleColor)> Sections;
 
-        public MazeCarver(IMap map) {
-            visitedPoints = new List<Point>();
+        public MazeCarver(Random rnd, IMap map) {
             this.map = map;
+            this.rnd = rnd;
+            Sections = new List<(List<Point>, ConsoleColor)>();
+            visitedPoints = new List<Point>();
         }
 
         public void CarveMaze(Point point) {
@@ -26,10 +31,27 @@ namespace Rogue.MazeGenerator {
             var directions = new List<Direction> { Direction.Right, Direction.Left, Direction.Up, Direction.Down }
                 .OrderBy(x => Guid.NewGuid());
 
+            var mazeSection = new List<Point> { point };
+            var sectionColor = new ConsoleColor[] { ConsoleColor.Magenta, ConsoleColor.Yellow, ConsoleColor.Blue, ConsoleColor.Red, ConsoleColor.Green }[rnd.Next(0, 5)];
+            Sections.Add((mazeSection, sectionColor));
+
             foreach (var dir in directions) {
                 var nextPoint = point.Increment(dir);
                 if (IsValid(nextPoint, dir)) {
+                    mazeSection.Add(nextPoint);
                     CarveMaze(nextPoint);
+                }
+            }
+
+            //Draw();
+        }
+
+        private void Draw() {
+            foreach (var section in Sections) {
+                foreach(var point in section.Item1) {
+                    Console.SetCursorPosition(point.X, point.Y);
+                    Console.ForegroundColor = section.Item2;
+                    Console.Write(".");
                 }
             }
         }

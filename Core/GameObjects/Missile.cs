@@ -6,7 +6,7 @@ using Color = System.Drawing.Color;
 namespace Rogue.GameObjects {
     public class Missile : GameObject {
         public bool Moving { get; set; }
-        public Missile(Point location) : base(location, GameObjectType.Missile) {
+        public Missile(Point location) : base(location) {
             Moving = true;
         }
 

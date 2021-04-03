@@ -25,7 +25,7 @@ namespace Rogue {
 
         private readonly RoomDecorator RoomDecorator;
 
-        public MapGenerator(RoomDecorator roomDecorator, int width, int height, int roomAttempts, int roomMinWidth, int roomMaxWidth, int roomMinHeight, int roomMaxHeight) {
+        public MapGenerator(Random rnd, RoomDecorator roomDecorator, int width, int height, int roomAttempts, int roomMinWidth, int roomMaxWidth, int roomMinHeight, int roomMaxHeight) {
             Width = width;
             Height = height;
             RoomAttempts = roomAttempts;
@@ -33,8 +33,8 @@ namespace Rogue {
             RoomMaxWidth = roomMaxWidth;
             RoomMinHeight = roomMinHeight;
             RoomMaxHeight = roomMaxHeight;
-            Rnd = new Random();
             RoomDecorator = roomDecorator;
+            Rnd = rnd;
         }
 
         public IMap GenerateMap(IMap? previousMap = null)
@@ -43,7 +43,7 @@ namespace Rogue {
             map.Level = previousMap == null ? 1 : previousMap.Level + 1;
             PlaceRooms(map, previousMap);
 
-            var maze = new MazeCarver(map);
+            var maze = new MazeCarver(Rnd, map);
 
             maze.CarveMaze(new Point(0, 0));
 
