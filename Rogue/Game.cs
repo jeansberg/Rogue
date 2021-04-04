@@ -2,6 +2,7 @@
 using Rogue.GameObjects;
 using System.Collections.Generic;
 using System.Linq;
+using Utilities.RogueSharp;
 
 namespace Rogue {
     public class Game {
@@ -32,6 +33,8 @@ namespace Rogue {
             var player = Getplayer(source);
             source.Actors.Remove(player);
             destination.Actors.Add(player);
+
+            player.Fov = new RogueSharpFov(destination);
         }
 
         private Player Getplayer(IMap map) { return (Player)map.Actors.Single(a => a is Player); }
