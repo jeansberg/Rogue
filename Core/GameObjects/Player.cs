@@ -79,11 +79,10 @@ namespace Rogue.GameObjects {
 
         public int? GetXpRequirementNextLevel() {
             return Level.number switch {
-                1 => 0,
-                2 => 50,
-                3 => 150,
-                4 => 450,
-                5 => 1350,
+                1 => 50,
+                2 => 150,
+                3 => 450,
+                4 => 1350,
                 _ => null
             };
         }
