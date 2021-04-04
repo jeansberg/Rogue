@@ -6,7 +6,6 @@ using Core;
 using Core.Interfaces;
 using Rogue.GameObjects;
 using Rogue.Map;
-using Rogue.MazeGenerator;
 using Utilities.RogueSharp;
 using Point = Core.Point;
 
@@ -55,7 +54,7 @@ namespace Rogue {
         }
 
         private void PlaceMonsters(IMap map) {
-            foreach(var room in map.Rooms) {
+            foreach(var room in map.Rooms.Where(r => !r.IsEntrance)) {
                 SpawnMonster(room, map);
             }
         }
