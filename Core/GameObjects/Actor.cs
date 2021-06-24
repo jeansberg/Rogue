@@ -9,12 +9,8 @@ namespace Rogue.GameObjects {
         public int MaxHealth { get; set; }
 
         public bool IsAlive => Health > 0;
-        public IFov Fov { get; set; }
+        public IFov Fov { get; protected set; }
         public List<GameObject> Inventory { get; set; }
-
-        public virtual void Damage(int damage) {
-            Health -= damage;
-        }
 
         public Actor(Point location, int health, IFov fov) :
             base(location) {
@@ -24,6 +20,17 @@ namespace Rogue.GameObjects {
 
             Inventory = new List<GameObject>();
         }
+
+        public abstract void TakeDamage(int damage);
+
+        public virtual void UpdateFov() {
+            Fov.ComputeFov(Location.X, Location.Y, 5, true);
+        }
+
+        public virtual void ReplaceFov(IFov newFov) {
+            Fov = newFov;
+        }
+
 
         public override IAction GetAction(IMap map, Direction from) {
            return Attack(null);

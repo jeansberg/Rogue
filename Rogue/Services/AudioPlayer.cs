@@ -1,6 +1,7 @@
 ﻿using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Rogue.Services {
@@ -20,20 +21,33 @@ namespace Rogue.Services {
             outputDevice.Play();
         }
 
-        public void PlaySound(string soundPattern) {
-            var matchingSoundFiles = System.IO.Directory.GetFiles(SfxPath, $"*{soundPattern}*", new System.IO.EnumerationOptions 
-            {
-                MatchCasing = System.IO.MatchCasing.CaseInsensitive,
-            });
-                
+        public void PlaySound(params string[] tags) {
+
+            string[] matchingSoundFiles = FindMatching(tags.Select(t => t.Replace(" ", "").ToLower()));
+
             if (!matchingSoundFiles.Any()) {
-                return;
+                tags[tags.Length-1] = "basic";
+                matchingSoundFiles = FindMatching(tags.Select(t => t.Replace(" ", "").ToLower()));
+                if (!matchingSoundFiles.Any()) {
+                    return;
+                }
             }
 
             var soundFile = matchingSoundFiles[rnd.Next(matchingSoundFiles.Length)];
 
             var input = new AudioFileReader(soundFile);
             AddMixerInput(new AutoDisposeFileReader(input));
+        }
+
+        private static string[] FindMatching(IEnumerable<string> tags) {
+            var matchingFiles = System.IO.Directory.GetFiles(SfxPath, $"*{tags.First()}*", new System.IO.EnumerationOptions {
+            });
+
+            return matchingFiles.Where(m => MatchesAllTags(m.ToLower(), tags)).ToArray();
+        }
+
+        private static bool MatchesAllTags(string file, IEnumerable<string> tags) {
+            return tags.All(t => file.Contains(t));
         }
 
         private ISampleProvider ConvertToRightChannelCount(ISampleProvider input) {

@@ -313,9 +313,9 @@ namespace Rogue.Components {
 
             var actor = actors
                 .SingleOrDefault(a => a.Location == mousePos && player.Fov.IsInFov(a.Location.X, a.Location.Y));
-            if (actor != null) {
-                messageConsole.SetMessage(actor.Name());
-            }
+                
+            messageConsole.SetMessage(actor?.Name() ?? "");
+            
 
             handled = true;
         }

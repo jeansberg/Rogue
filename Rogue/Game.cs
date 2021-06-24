@@ -34,7 +34,7 @@ namespace Rogue {
             source.Actors.Remove(player);
             destination.Actors.Add(player);
 
-            player.Fov = new RogueSharpFov(destination);
+            player.ReplaceFov(new RogueSharpFov(destination));
         }
 
         private Player Getplayer(IMap map) { return (Player)map.Actors.Single(a => a is Player); }

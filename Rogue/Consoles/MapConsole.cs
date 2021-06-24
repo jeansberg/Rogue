@@ -1,8 +1,6 @@
 ﻿using Core;
 using Core.Interfaces;
 using Rogue.GameObjects;
-using Rogue.Map;
-using Rogue.MazeGenerator;
 using Rogue.Primitives;
 using Rogue.Services;
 using SadConsole;
@@ -40,7 +38,7 @@ namespace Rogue.Consoles {
 
             var player = map.Actors.Single(a => a is Player) as Player;
 
-            player!.Fov.ComputeFov(player.Location.X, player.Location.Y, 5, true);
+            player.UpdateFov();
 
             map.Cells()
                 .Where(c => player.Fov.IsInFov(c.Location.X, c.Location.Y))
@@ -59,13 +57,6 @@ namespace Rogue.Consoles {
             var newPoint = actor.Location.Increment(dir);
             if (!map.InBounds(newPoint) || !map.IsWalkable(newPoint) || actors.Any(actor => actor.Location == newPoint)) {
                 return;
-            }
-
-            if (actor is Player) {
-                // Do nothing
-            }
-            else {
-                Locator.Audio.PlaySound("footStep");
             }
 
             actor.Location = newPoint;

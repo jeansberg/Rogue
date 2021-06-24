@@ -81,5 +81,13 @@ namespace Rogue.GameObjects {
             MonsterType.Snake => 1,
             _ => throw new NotImplementedException(),
         };
+
+        public override void TakeDamage(int damage) {
+            Health -= damage;
+
+            if (!IsAlive) {
+                Locator.Audio.PlaySound(Name(), "die");
+            }
+        }
     }
 }

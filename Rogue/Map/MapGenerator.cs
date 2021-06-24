@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using Core;
@@ -122,6 +123,10 @@ namespace Rogue {
                 else {
                     // Remove non-connected room
                     // Todo: Fix the maze generation issue that causes this
+                    //if (room.IsEntrance || room.IsExit) {
+                        throw new Exception("Could not connect entrance or exit room to maze!");
+                    //}
+
                     roomsToDelete.Add(room);
 
                     Rectangle.Inflate(bounds, 2, 2).Points()
@@ -223,6 +228,7 @@ namespace Rogue {
             while (exit == null) {
                 exit = CreateRoom(map, isEntrance: false, isExit: true);
             }
+            Debug.Assert(map.Rooms.Any(r => r.IsExit));
 
             var midPoint = map.GetCellAt(exit.Bounds.Center());
             midPoint.Type = CellType.StairCaseDown;

@@ -87,7 +87,7 @@ namespace Rogue {
                         CellType.Wall => "#",
                         CellType.RoomFloor => ".",
                         CellType.Maze => ".",
-                        CellType.Connector => "X",
+                        CellType.Connector => "?",
                         CellType.RoomWallVertical => "|",
                         CellType.RoomWallHorizontal => "-",
                         CellType.StairCaseDown => ">",

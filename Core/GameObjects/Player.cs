@@ -2,7 +2,8 @@
 using Core.GameObjects;
 using Core.Interfaces;
 using Rogue.Services;
-using System;
+using System.Collections.Generic;
+using System.Linq;
 using Color = System.Drawing.Color;
 
 namespace Rogue.GameObjects {
@@ -86,5 +87,47 @@ namespace Rogue.GameObjects {
                 _ => null
             };
         }
-    }}
+
+        public override void TakeDamage(int damage) {
+            Health -= damage;
+        }
+
+        public override void ReplaceFov(IFov newFov) {
+            base.ReplaceFov(newFov);
+        }
+
+        public override void UpdateFov() {
+            List<Monster> monstersInFov = GetMonstersInFov(Fov);
+
+            base.UpdateFov();
+
+            TriggerMonsterDiscoveredSound(monstersInFov);
+        }
+
+        private void TriggerMonsterDiscoveredSound(List<Monster> visibleMonsters) {
+            var newVisibleMonsters = GetMonstersInFov(Fov);
+            var newlyRevealedMonsters = newVisibleMonsters.Except(visibleMonsters)
+                .ToList();
+
+            if (newlyRevealedMonsters == null || newlyRevealedMonsters.Count == 0) {
+                return;
+            }
+
+            var highestLevelMonster = newlyRevealedMonsters
+                .OrderBy(m => Monster.DungeonLevelRange(m.MonsterType).MinLevel)
+                .Last();
+
+            Locator.Audio.PlaySound(highestLevelMonster.Name(), "discovered");
+        }
+
+        private List<Monster> GetMonstersInFov(IFov fov) {
+            var actorsInFov = fov.GetActorsInFov();
+
+            var monstersInFov = actorsInFov.Where(a => a is Monster)
+                .Select(a => (Monster)a)
+                .ToList();
+            return monstersInFov;
+        }
+    }
+}
 

@@ -12,14 +12,15 @@ namespace Rogue.Actions {
         }
 
         public ActionResult Perform(Actor actor, bool defaultAction = false) {
+            Locator.Audio.PlaySound("attack", actor.Name());
+            
             var damage = new DamageRange(target, actor, missile).GetDamage();
-            target.Health -= damage;
+            target.TakeDamage(damage);
 
             if (!target.IsAlive && actor is Player p) {
                 p.SetExperience(p.GetExperience() + Monster.ExperienceReward(((Monster)target).MonsterType));
             }
 
-            Locator.Audio.PlaySound("hit");
             return ActionResult.Succeed($"{actor.Name()} attacked {target.Name()} for {damage} damage", false);
         }
     }

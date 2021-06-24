@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using RogueSharp;
 using System.Linq;
 using ICell = Core.Interfaces.ICell;
+using Rogue.GameObjects;
 
 namespace Utilities.RogueSharp {
     public class RogueSharpFov : IFov {
@@ -21,6 +22,11 @@ namespace Utilities.RogueSharp {
             Fov = new FieldOfView(rogueSharpMap);
 
             return Fov.ComputeFov(xOrigin, yOrigin, radius, lightWalls).Select(c => map.GetCellAt(new Core.Point(xOrigin, yOrigin))).ToList();
+        }
+
+        public List<Actor> GetActorsInFov() {
+            return map.Actors.Where(a => Fov.IsInFov(a.Location.X, a.Location.Y))
+                .ToList();
         }
 
         public bool IsInFov(int x, int y) {
