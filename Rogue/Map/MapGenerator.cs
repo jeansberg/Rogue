@@ -47,7 +47,10 @@ namespace Rogue {
 
             maze.CarveMaze(new Point(0, 0));
 
-            ConnectRooms(map);
+            while (!ConnectRooms(map)) {
+
+            }
+
             DecorateRooms(map);
             PlaceMonsters(map);
  
@@ -91,7 +94,7 @@ namespace Rogue {
             map.GameObjects.AddRange(decorations);
         }
 
-        private void ConnectRooms(IMap map) {
+        private bool ConnectRooms(IMap map) {
             var connectorCandidates = new List<ICell>();
             foreach (var cell in map.Cells().Where(IsWall())) {
                 if (IsConnectorCandidate(cell, map)) {
@@ -124,7 +127,7 @@ namespace Rogue {
                     // Remove non-connected room
                     // Todo: Fix the maze generation issue that causes this
                     //if (room.IsEntrance || room.IsExit) {
-                        throw new Exception("Could not connect entrance or exit room to maze!");
+                    return false;
                     //}
 
                     roomsToDelete.Add(room);
@@ -145,6 +148,8 @@ namespace Rogue {
                 }
             }
             map.Rooms.RemoveAll(r => roomsToDelete.Contains(r));
+
+            return true;
         }
 
         private static Func<ICell, bool> HasDoor(IMap map) {
