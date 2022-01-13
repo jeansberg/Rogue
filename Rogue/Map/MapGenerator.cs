@@ -47,10 +47,7 @@ namespace Rogue {
 
             maze.CarveMaze(new Point(0, 0));
 
-            while (!ConnectRooms(map)) {
-
-            }
-
+            ConnectRooms(map);
             DecorateRooms(map);
             PlaceMonsters(map);
  
@@ -126,9 +123,9 @@ namespace Rogue {
                 else {
                     // Remove non-connected room
                     // Todo: Fix the maze generation issue that causes this
-                    //if (room.IsEntrance || room.IsExit) {
-                    return false;
-                    //}
+                    if (room.IsEntrance || room.IsExit) {
+                        throw new Exception("Could not connect entrance or exit room to maze!");
+                    }
 
                     roomsToDelete.Add(room);
 

@@ -76,10 +76,11 @@ namespace Rogue {
             var logConsole = new LogConsole();
             var messageConsole = new MessageConsole();
             var statusConsole = new StatusConsole(player);
+            var menuConsole = new MenuConsole(Width, Height);
 
             var inventory = new InventoryConsole(player);
 
-            var keyboardHandler = new KeyboardHandler(mapConsole, logConsole, messageConsole, player, inventory, game, () => StartGame(rnd));
+            var keyboardHandler = new KeyboardHandler(mapConsole, logConsole, messageConsole, player, inventory, menuConsole, game, () => StartGame(rnd));
 
             var mainConsole = new MainConsole(mapConsole, logConsole, messageConsole, statusConsole, keyboardHandler, inventory);
 
@@ -88,6 +89,7 @@ namespace Rogue {
             mainConsole.Children.Add(messageConsole);
             mainConsole.Children.Add(statusConsole);
             mainConsole.Children.Add(inventory);
+            mainConsole.Children.Add(menuConsole);
 
             SadConsole.Game.Instance.Screen = mainConsole;
         }

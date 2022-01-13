@@ -20,6 +20,7 @@ namespace Rogue.Components {
         private readonly LogConsole logConsole;
         private Player player;
         private readonly InventoryConsole inventory;
+        private readonly MenuConsole menuConsole;
         private readonly Game game;
         private List<Actor> actors { get { return game.Map.Actors; } }
         private readonly Action startGame;
@@ -28,12 +29,13 @@ namespace Rogue.Components {
         private List<Point> trajectory;
         private bool playerMoved;
 
-        public KeyboardHandler(MapConsole mapConsole, LogConsole logConsole, MessageConsole messageConsole, Player player, InventoryConsole inventory, Game game, Action startGame) {
+        public KeyboardHandler(MapConsole mapConsole, LogConsole logConsole, MessageConsole messageConsole, Player player, InventoryConsole inventory, MenuConsole menuConsole, Game game, Action startGame) {
             this.mapConsole = mapConsole;
             this.logConsole = logConsole;
             this.messageConsole = messageConsole;
             this.player = player;
             this.inventory = inventory;
+            this.menuConsole = menuConsole;
             this.game = game;
             this.startGame = startGame;
             state = InputState.Idle;
@@ -135,7 +137,9 @@ namespace Rogue.Components {
 
         public void Update(SadConsole.Console console, TimeSpan delta) {
             if (player.Health < 1) {
-                startGame();
+                menuConsole.SetMessage("You have died.");
+
+                //startGame();
             }
 
             mapConsole.map.GameObjects.RemoveAll(g => g is Missile m && !m.Moving);
